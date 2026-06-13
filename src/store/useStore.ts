@@ -251,6 +251,7 @@ export const useStore = create<AppState>()(
             
             const expectedBalance = Math.round((initialBalance + netEffect) * 100) / 100;
             if (account.balance !== expectedBalance || account.initialBalance === undefined) {
+              console.log(`[recalculateBalances] ${account.name}: balance=${account.balance} expected=${expectedBalance} initialBalance=${initialBalance}→${Math.round((account.balance - netEffect) * 100) / 100} netEffect=${netEffect} — anchoring initialBalance, NOT changing balance`);
               changed = true;
               return {
                 ...account,
