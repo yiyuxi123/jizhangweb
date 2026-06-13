@@ -433,6 +433,29 @@ export const useStore = create<AppState>()(
           await syncToCloud(async () => { await firestoreService.addDocument('accounts', newAccount); });
         },
         updateAccount: async (id, account) => {
+          // If user manually changed the balance, recalculate initialBalance
+          // so that future recalculateBalances() won't override the user's manual edit.
+          // User edits have the highest priority — 无视账单溯源.
+          if (account.balance !== undefined) {
+            const { transactions } = get();
+            const accountTxs = transactions.filter(t =>
+              t.fromAccountId === id || t.toAccountId === id
+            );
+            const netEffect = accountTxs.reduce((sum, t) => {
+              if (t.type === 'expense' && t.fromAccountId === id) return sum - t.amount;
+              if (t.type === 'income' && t.toAccountId === id) return sum + t.amount;
+              if (t.type === 'transfer') {
+                if (t.fromAccountId === id) return sum - t.amount;
+                if (t.toAccountId === id) return sum + t.amount;
+              }
+              return sum;
+            }, 0);
+            account = {
+              ...account,
+              initialBalance: Math.round((account.balance - netEffect) * 100) / 100
+            };
+          }
+
           set((state) => ({ accounts: state.accounts.map(a => a.id === id ? { ...a, ...account, updatedAt: Date.now() } : a) }));
           await syncToCloud(async () => { await firestoreService.updateDocument('accounts', id, { ...account, updatedAt: Date.now() }); });
         },
