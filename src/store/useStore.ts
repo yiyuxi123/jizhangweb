@@ -148,7 +148,13 @@ export const useStore = create<AppState>()(
 
         setAccounts: (accounts) => set({ accounts: accounts.sort((a, b) => (a.order || 0) - (b.order || 0)) }),
         setCategories: (categories) => set({ categories: categories.sort((a, b) => (a.order || 0) - (b.order || 0)) }),
-        setTransactions: (transactions) => set({ transactions }),
+        setTransactions: (transactions) => set({ 
+          transactions: [...transactions].sort((a, b) => {
+            const timeA = a.date ? new Date(a.date).getTime() : 0;
+            const timeB = b.date ? new Date(b.date).getTime() : 0;
+            return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+          }) 
+        }),
         setBudgets: (budgets) => set({ budgets }),
         setTemplates: (templates) => set({ templates }),
         setGoals: (goals) => set({ goals }),
@@ -184,7 +190,11 @@ export const useStore = create<AppState>()(
           }
 
           set((state) => ({ 
-            transactions: [newTx, ...state.transactions],
+            transactions: [newTx, ...state.transactions].sort((a, b) => {
+              const timeA = a.date ? new Date(a.date).getTime() : 0;
+              const timeB = b.date ? new Date(b.date).getTime() : 0;
+              return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+            }),
             accounts
           }));
 
@@ -229,7 +239,11 @@ export const useStore = create<AppState>()(
           }
 
           set((state) => ({
-            transactions: state.transactions.map(t => t.id === id ? newTx : t),
+            transactions: state.transactions.map(t => t.id === id ? newTx : t).sort((a, b) => {
+              const timeA = a.date ? new Date(a.date).getTime() : 0;
+              const timeB = b.date ? new Date(b.date).getTime() : 0;
+              return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+            }),
             accounts
           }));
 
@@ -530,7 +544,11 @@ export const useStore = create<AppState>()(
             set({
               accounts: accSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
               categories: catSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
-              transactions: txSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
+              transactions: txSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)).sort((a, b) => {
+                const timeA = a.date ? new Date(a.date).getTime() : 0;
+                const timeB = b.date ? new Date(b.date).getTime() : 0;
+                return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+              }),
               budgets: budSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
               templates: tplSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
               goals: goalSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
@@ -568,6 +586,10 @@ export const useStore = create<AppState>()(
               if (cleanTx.history) delete cleanTx.history;
               if (cleanTx.note && cleanTx.note.length > 500) cleanTx.note = cleanTx.note.substring(0, 500);
               return cleanTx;
+            }).sort((a: any, b: any) => {
+              const timeA = a.date ? new Date(a.date).getTime() : 0;
+              const timeB = b.date ? new Date(b.date).getTime() : 0;
+              return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
             }),
             budgets: data.budgets || [],
             templates: data.templates || [],
@@ -682,7 +704,13 @@ export const useStore = create<AppState>()(
 
             await syncSingleCollection('accounts', get().accounts, (items) => set({ accounts: items.sort((a, b) => (a.order || 0) - (b.order || 0)) }));
             await syncSingleCollection('categories', get().categories, (items) => set({ categories: items.sort((a, b) => (a.order || 0) - (b.order || 0)) }));
-            await syncSingleCollection('transactions', get().transactions, (items) => set({ transactions: items }));
+            await syncSingleCollection('transactions', get().transactions, (items) => set({ 
+              transactions: [...items].sort((a, b) => {
+                const timeA = a.date ? new Date(a.date).getTime() : 0;
+                const timeB = b.date ? new Date(b.date).getTime() : 0;
+                return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+              }) 
+            }));
             await syncSingleCollection('budgets', get().budgets, (items) => set({ budgets: items }));
             await syncSingleCollection('templates', get().templates, (items) => set({ templates: items }));
             await syncSingleCollection('goals', get().goals, (items) => set({ goals: items }));
