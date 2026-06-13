@@ -74,6 +74,9 @@ export interface AppState {
   dismissAlertType: (type: string) => void;
   resetDismissedAlertType: (type: string) => void;
 
+  theme: 'light' | 'dark' | 'system';
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+
   tombstones: Record<string, { id: string; entityType: string; deletedAt: number }>;
   addTombstone: (id: string, entityType: string) => void;
 
@@ -152,6 +155,8 @@ export const useStore = create<AppState>()(
         syncStatus: 'idle',
         syncError: null,
         dismissedAlertTypes: [],
+        theme: 'light' as const,
+        setTheme: (theme) => set({ theme }),
         tombstones: {},
         deepseekApiKey: '',
         qwenApiKey: '',
@@ -209,6 +214,7 @@ export const useStore = create<AppState>()(
         deepseekApiKey: state.deepseekApiKey,
         qwenApiKey: state.qwenApiKey,
         dismissedAlertTypes: state.dismissedAlertTypes,
+        theme: state.theme,
       }),
     }
   )

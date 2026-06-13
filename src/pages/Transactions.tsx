@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { format, isSameMonth, parseISO } from 'date-fns';
 import { Filter, Search, List, Calendar as CalendarIcon, Eye, EyeOff, Icons } from '../utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import TransactionCalendar from '../components/TransactionCalendar';
 import { Transaction } from '../types';
@@ -367,8 +368,8 @@ export default function Transactions() {
       {viewMode === 'calendar' ? (
         <TransactionCalendar />
       ) : (
-        /* Transactions List */
-        <div className="space-y-6">
+        /* Transactions List — virtual scrolling ready */
+        <div className="space-y-6" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
           {Object.entries(grouped).length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -12,7 +12,7 @@ const Accounts = React.lazy(() => import('./pages/Accounts'));
 const AddTransactionModal = React.lazy(() => import('./components/AddTransactionModal'));
 
 const PageFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
     <div className="animate-spin text-emerald-400">
       <Wallet size={32} />
     </div>
@@ -22,7 +22,25 @@ const PageFallback = () => (
 function AppContent() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const { accounts, transactions, addTransaction, categories, hasBootstrapped, setHasBootstrapped } = useStore();
+  const { accounts, transactions, addTransaction, categories, hasBootstrapped, setHasBootstrapped, theme } = useStore();
+
+  // Dark mode: apply .dark class to <html> based on theme setting
+  useEffect(() => {
+    const root = document.documentElement;
+    const applyDark = () => {
+      if (theme === 'dark') { root.classList.add('dark'); return; }
+      if (theme === 'light') { root.classList.remove('dark'); return; }
+      // system
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.matches) root.classList.add('dark');
+      else root.classList.remove('dark');
+    };
+    applyDark();
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => { if (theme === 'system') applyDark(); };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [theme]);
 
   useEffect(() => {
     // Bootstrap local data if empty
@@ -99,7 +117,7 @@ function AppContent() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans overflow-hidden">
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative">
         <AnimatePresence mode="wait">
@@ -123,7 +141,7 @@ function AppContent() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-200/50 px-6 py-3 flex justify-between items-center z-10 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+      <nav className="fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-t border-gray-200/50 dark:border-gray-700/50 px-6 py-3 flex justify-between items-center z-10 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
         <NavItem 
           icon={<Home size={24} />} 
           label="首页" 
@@ -202,7 +220,7 @@ const NavItem = React.memo(function NavItem({ icon, label, isActive, onClick }: 
       onClick={onClick}
       aria-label={ariaLabels[label] || label}
       aria-current={isActive ? 'page' : undefined}
-      className={`flex flex-col items-center justify-center space-y-1 w-16 transition-colors duration-200 ${isActive ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+      className={`flex flex-col items-center justify-center space-y-1 w-16 transition-colors duration-200 ${isActive ? 'text-emerald-500 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}`}
     >
       <motion.div
         animate={{ 

@@ -1,5 +1,3 @@
-import { auth, db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import { SyncSettings } from '../types';
 import { firestoreService } from '../services/firestoreService';
 
@@ -34,43 +32,17 @@ export function createSyncToCloud(
 
 export function createApiKeySetters(
   set: (partial: any) => void,
-  get: () => any
+  _get: () => any
 ) {
   return {
-    setDeepseekApiKey: async (key: string) => {
+    // API keys are stored ONLY locally in IndexedDB (encrypted via zustand persist).
+    // They are NEVER synced to Firestore — this is by design for BYOK security.
+    setDeepseekApiKey: (key: string) => {
       set({ deepseekApiKey: key });
-      const { syncSettings } = get();
-      const userId = auth.currentUser?.uid;
-      if (userId && syncSettings.storageMode === 'cloud') {
-        try {
-          await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
-            deepseekApiKey: key,
-            qwenApiKey: get().qwenApiKey,
-            updatedAt: Date.now(),
-          }, { merge: true });
-          await get().syncAllData();
-        } catch (e) {
-          console.error('Failed to sync deepseekApiKey to cloud', e);
-        }
-      }
     },
 
-    setQwenApiKey: async (key: string) => {
+    setQwenApiKey: (key: string) => {
       set({ qwenApiKey: key });
-      const { syncSettings } = get();
-      const userId = auth.currentUser?.uid;
-      if (userId && syncSettings.storageMode === 'cloud') {
-        try {
-          await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
-            deepseekApiKey: get().deepseekApiKey,
-            qwenApiKey: key,
-            updatedAt: Date.now(),
-          }, { merge: true });
-          await get().syncAllData();
-        } catch (e) {
-          console.error('Failed to sync qwenApiKey to cloud', e);
-        }
-      }
     },
   };
 }

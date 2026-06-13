@@ -89,7 +89,9 @@ import {
   Loader2,
   BellOff,
   Key,
-  Bell
+  Bell,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export {
@@ -183,7 +185,9 @@ export {
   Loader2,
   BellOff,
   Key,
-  Bell
+  Bell,
+  Sun,
+  Moon
 };
 
 export const Icons = {
@@ -277,5 +281,7 @@ export const Icons = {
   Loader2,
   BellOff,
   Key,
-  Bell
+  Bell,
+  Sun,
+  Moon
 };

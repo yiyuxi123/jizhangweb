@@ -16,6 +16,8 @@ export default class ErrorBoundary extends Component<Props, State> {
     error: null
   };
 
+  private _children: ReactNode = null;
+
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
@@ -36,6 +38,8 @@ export default class ErrorBoundary extends Component<Props, State> {
   };
 
   public render() {
+    this._children = (this as any).props.children;
+
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 text-center select-none font-sans">
@@ -76,6 +80,6 @@ export default class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return this._children;
   }
 }

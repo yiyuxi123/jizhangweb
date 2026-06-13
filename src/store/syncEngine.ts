@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, writeBatch, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { firestoreService } from '../services/firestoreService';
 import { Category, Account, Budget, TransactionTemplate, SavingGoal, Transaction } from '../types';
@@ -69,18 +69,7 @@ export function createSyncToCloudNow(set: SetFn, get: GetFn) {
         for (const b of batches) await b.commit();
       }
 
-      if (state.deepseekApiKey || state.qwenApiKey) {
-        await setDoc(
-          doc(db, `users/${userId}/config`, 'api_keys'),
-          {
-            deepseekApiKey: state.deepseekApiKey || '',
-            qwenApiKey: state.qwenApiKey || '',
-            updatedAt: Date.now(),
-          },
-          { merge: true }
-        );
-      }
-
+      // API keys are intentionally NOT synced — BYOK stays local only
       set({ syncSettings: { ...state.syncSettings, lastSyncTime: Date.now() } });
     } catch (e: any) {
       console.error('Failed to syncToCloudNow:', e);
@@ -112,20 +101,16 @@ export function createPullFromCloud(set: SetFn, get: GetFn) {
     set({ syncStatus: 'syncing' });
 
     try {
-      const [accSnap, catSnap, txSnap, budSnap, tplSnap, goalSnap, keysSnap] = await Promise.all([
+      const [accSnap, catSnap, txSnap, budSnap, tplSnap, goalSnap] = await Promise.all([
         getDocs(collection(db, `users/${userId}/accounts`)),
         getDocs(collection(db, `users/${userId}/categories`)),
         getDocs(collection(db, `users/${userId}/transactions`)),
         getDocs(collection(db, `users/${userId}/budgets`)),
         getDocs(collection(db, `users/${userId}/templates`)),
         getDocs(collection(db, `users/${userId}/goals`)),
-        getDoc(doc(db, `users/${userId}/config`, 'api_keys')).catch(() => null),
       ]);
 
-      const keysData = keysSnap && keysSnap.exists() ? keysSnap.data() : null;
-      const remoteDSKey = keysData?.deepseekApiKey || '';
-      const remoteQWKey = keysData?.qwenApiKey || '';
-
+      // API keys are local-only — not pulled from cloud
       set({
         accounts: accSnap.docs.map((d) => ({ ...d.data(), id: d.id } as any)),
         categories: catSnap.docs.map((d) => ({ ...d.data(), id: d.id } as any)),
@@ -139,8 +124,6 @@ export function createPullFromCloud(set: SetFn, get: GetFn) {
         budgets: budSnap.docs.map((d) => ({ ...d.data(), id: d.id } as any)),
         templates: tplSnap.docs.map((d) => ({ ...d.data(), id: d.id } as any)),
         goals: goalSnap.docs.map((d) => ({ ...d.data(), id: d.id } as any)),
-        deepseekApiKey: remoteDSKey || get().deepseekApiKey,
-        qwenApiKey: remoteQWKey || get().qwenApiKey,
         syncSettings: { ...get().syncSettings, lastSyncTime: Date.now() },
         syncStatus: 'synced',
       });
@@ -613,26 +596,7 @@ export function createSyncAllData(set: SetFn, get: GetFn) {
         uploadAndDeleteSingleCollection('goals', get().goals, goalsResult.remoteItemsMap),
       ]);
 
-      try {
-        const keysDocRef = doc(db, `users/${userId}/config`, 'api_keys');
-        const keysSnap = await getDoc(keysDocRef);
-        const { deepseekApiKey, qwenApiKey } = get();
-        if (keysSnap.exists()) {
-          const keysData = keysSnap.data();
-          const remoteDSKey = keysData.deepseekApiKey || '';
-          const remoteQWKey = keysData.qwenApiKey || '';
-          if (!deepseekApiKey && !qwenApiKey) {
-            set({ deepseekApiKey: remoteDSKey, qwenApiKey: remoteQWKey });
-          } else if (remoteDSKey !== deepseekApiKey || remoteQWKey !== qwenApiKey) {
-            await setDoc(keysDocRef, { deepseekApiKey: deepseekApiKey || remoteDSKey, qwenApiKey: qwenApiKey || remoteQWKey, updatedAt: Date.now() }, { merge: true });
-            set({ deepseekApiKey: deepseekApiKey || remoteDSKey, qwenApiKey: qwenApiKey || remoteQWKey });
-          }
-        } else if (deepseekApiKey || qwenApiKey) {
-          await setDoc(keysDocRef, { deepseekApiKey, qwenApiKey, updatedAt: Date.now() });
-        }
-      } catch (e) {
-        console.error('Failed to sync API keys during syncAllData', e);
-      }
+      // API keys are local-only — intentionally excluded from bidirectional sync
 
       const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
       const activeTombstones = { ...get().tombstones };

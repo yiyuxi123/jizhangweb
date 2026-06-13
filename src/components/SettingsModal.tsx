@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Icons } from '../utils/icons';
 import { useStore } from '../store/useStore';
 
-type SettingsTab = 'sync' | 'api' | 'notifications';
+type SettingsTab = 'sync' | 'api' | 'notifications' | 'appearance';
 
 const ALERT_TYPE_LABELS: Record<string, string> = {
   network_offline: '网络离线提示',
@@ -27,7 +27,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
     qwenApiKey,
     setQwenApiKey,
     dismissedAlertTypes,
-    resetDismissedAlertType
+    resetDismissedAlertType,
+    theme,
+    setTheme: storeSetTheme,
   } = useStore();
 
   const [activeTab, setActiveTab] = useState<SettingsTab>('sync');
@@ -113,16 +115,17 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
     { key: 'sync', label: '同步设置', icon: <Icons.RefreshCw size={16} /> },
     { key: 'api', label: 'API 密钥', icon: <Icons.Key size={16} /> },
     { key: 'notifications', label: '通知设置', icon: <Icons.Bell size={16} /> },
+    { key: 'appearance', label: '外观', icon: <Icons.Sun size={16} /> },
   ];
 
   const allKnownAlertTypes = ['network_offline', 'auth_timeout', 'sync_error'];
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div role="dialog" aria-modal="true" aria-labelledby="settings-title" className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
-          <h2 id="settings-title" className="text-xl font-bold text-gray-900">设置</h2>
-          <button onClick={handleClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+      <div role="dialog" aria-modal="true" aria-labelledby="settings-title" className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700 shrink-0">
+          <h2 id="settings-title" className="text-xl font-bold text-gray-900 dark:text-gray-100">设置</h2>
+          <button onClick={handleClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
             <Icons.X size={24} />
           </button>
         </div>
@@ -267,7 +270,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">AI 智能助理密钥设置</h3>
               </div>
               <p className="text-[10px] text-gray-400 leading-normal">
-                密钥仅安全地保存在当前设备本地缓存 (IndexedDB) 中，不会在云端存储，也不会明文上传到第三方。
+                密钥仅保存在当前设备本地 (IndexedDB)。<strong>不会同步到云端</strong>，不会上传至任何第三方服务。BYOK（自带密钥）模式保障数据隐私。
               </p>
 
               <div className="space-y-3">
@@ -397,6 +400,45 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                   <p className="text-xs text-gray-400">所有提示消息均已开启</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ===== APPEARANCE TAB ===== */}
+          {activeTab === 'appearance' && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Icons.Sun size={18} className="text-amber-500" />
+                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">外观设置</h3>
+              </div>
+
+              <div className="space-y-2">
+                {([
+                  { value: 'light' as const, label: '浅色模式', icon: <Icons.Sun size={20} />, desc: '始终使用浅色主题' },
+                  { value: 'dark' as const, label: '深色模式', icon: <Icons.Moon size={20} />, desc: '始终使用深色主题' },
+                  { value: 'system' as const, label: '跟随系统', icon: <Icons.Monitor size={20} />, desc: '根据系统设置自动切换' },
+                ] as const).map(({ value, label, icon, desc }) => (
+                  <button
+                    key={value}
+                    onClick={() => storeSetTheme(value)}
+                    className={`w-full p-4 rounded-2xl border-2 flex items-center space-x-3 transition-all ${
+                      theme === value
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        : 'border-gray-100 bg-white text-gray-500 hover:border-emerald-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                    }`}
+                  >
+                    <div className={`shrink-0 ${theme === value ? 'text-emerald-500 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {icon}
+                    </div>
+                    <div className="text-left flex-1">
+                      <div className="font-medium text-sm">{label}</div>
+                      <div className="text-[10px] opacity-60">{desc}</div>
+                    </div>
+                    {theme === value && (
+                      <Icons.CheckCircle2 size={18} className="shrink-0 text-emerald-500 dark:text-emerald-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
