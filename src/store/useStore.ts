@@ -254,8 +254,9 @@ export const useStore = create<AppState>()(
               changed = true;
               return {
                 ...account,
-                initialBalance,
-                balance: expectedBalance,
+                // Anchor initialBalance to current balance — user's manual edits
+                // have the highest priority and must never be overridden. 无视账单溯源.
+                initialBalance: Math.round((account.balance - netEffect) * 100) / 100,
                 updatedAt: Date.now()
               };
             }
