@@ -379,15 +379,15 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
       >
         
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
             <Icons.X size={24} />
           </button>
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl">
+          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl">
             {(['expense', 'income', 'transfer'] as const).map(t => (
               <button
                 key={t}
@@ -416,8 +416,8 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         </div>
 
         {/* Quick Add Templates Row */}
-        <div className="px-6 py-2 border-b border-gray-100 bg-gray-50/50 flex items-center space-x-2 overflow-x-auto shrink-0 snap-x">
-          <span className="text-[10px] font-extrabold text-gray-400 shrink-0 mr-1 flex items-center">
+        <div className="px-6 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 flex items-center space-x-2 overflow-x-auto shrink-0 snap-x">
+          <span className="text-[10px] font-extrabold text-gray-400 dark:text-gray-500 shrink-0 mr-1 flex items-center">
             <Icons.Zap size={12} className="text-yellow-500 mr-0.5" /> 快捷模板:
           </span>
           {templates.map(tpl => {
@@ -438,11 +438,11 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     setShowNumpad(true);
                   }
                 }}
-                className="snap-start shrink-0 px-2.5 py-1 bg-white hover:bg-emerald-50 hover:text-emerald-700 text-xs font-semibold text-gray-700 border border-gray-200 rounded-full transition-colors flex items-center space-x-1 shadow-sm"
+                className="snap-start shrink-0 px-2.5 py-1 bg-white dark:bg-gray-800 hover:bg-emerald-50 hover:text-emerald-700 text-xs font-semibold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-full transition-colors flex items-center space-x-1 shadow-sm"
               >
                 <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: tpl.type === 'transfer' ? '#6b7280' : cat?.color || '#9ca3af' }} />
                 <span>{tpl.name}</span>
-                {tpl.amount > 0 && <span className="text-[10px] text-gray-400 font-normal">¥{tpl.amount}</span>}
+                {tpl.amount > 0 && <span className="text-[10px] text-gray-400 dark:text-gray-500 font-normal">¥{tpl.amount}</span>}
               </button>
             );
           })}
@@ -457,7 +457,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           <button
             type="button"
             onClick={() => setIsManageTemplatesOpen(true)}
-            className="snap-start shrink-0 p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full transition-colors shadow-sm"
+            className="snap-start shrink-0 p-1.5 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 text-gray-500 dark:text-gray-400 dark:text-gray-500 rounded-full transition-colors shadow-sm"
             title="管理快捷模板"
           >
             <Icons.Settings size={10} />
@@ -471,7 +471,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
             className="flex items-center border-b-2 border-emerald-500 py-2 cursor-pointer"
             onClick={() => setShowNumpad(true)}
           >
-            <span className="text-3xl font-bold text-gray-900 mr-2">¥</span>
+            <span className="text-3xl font-bold text-gray-900 dark:text-gray-100 mr-2">¥</span>
             <div className={`w-full text-4xl font-bold ${amount ? 'text-gray-900' : 'text-gray-300'}`}>
               {amount || '0.00'}
             </div>
@@ -496,7 +496,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 onChange={e => setAiInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAiTextParse()}
                 placeholder="在此输入一句话，如：刚才微信买奶茶花了15"
-                className="flex-1 px-3 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none animate-pulse-slow"
+                className="flex-1 px-3 py-2 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none animate-pulse-slow"
               />
               <button
                 type="button"
@@ -516,7 +516,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     type="button"
                     onClick={takePhotoNative}
                     disabled={aiLoading}
-                    className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
                   >
                     <Icons.Camera size={14} />
                     <span>拍照</span>
@@ -525,7 +525,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     type="button"
                     onClick={choosePhotoNative}
                     disabled={aiLoading}
-                    className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
                   >
                     <Icons.Image size={14} />
                     <span>上传图片</span>
@@ -545,7 +545,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     />
                     <button
                       type="button"
-                      className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Icons.Camera size={14} />
                       <span>拍照</span>
@@ -562,7 +562,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     />
                     <button
                       type="button"
-                      className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Icons.Image size={14} />
                       <span>上传图片</span>
@@ -575,7 +575,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
 
           {/* Image Preview / Attachment */}
           {image && (
-            <div className="relative bg-gray-50 border border-indigo-100/50 rounded-2xl p-3 flex flex-col items-center justify-center space-y-2">
+            <div className="relative bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-indigo-100/50 rounded-2xl p-3 flex flex-col items-center justify-center space-y-2">
               <img src={image} alt="单据凭证" className="max-h-40 max-w-full rounded-lg object-contain" />
               <div className="flex space-x-2 w-full">
                 <button
@@ -603,7 +603,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           {/* Categories Grid */}
           {type !== 'transfer' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">分类</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">分类</label>
               <div className="grid grid-cols-4 gap-4">
                 {filteredCategories.map(cat => {
                   const IconComponent = (Icons as any)[cat.icon] || Icons.HelpCircle;
@@ -641,13 +641,13 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           <div className="space-y-4">
             {type !== 'income' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   {type === 'transfer' ? '转出账户' : '付款账户'}
                 </label>
                 <select 
                   value={fromAccountId} 
                   onChange={e => setFromAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                 >
                   {accounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name} (余额: ¥{acc.balance})</option>
@@ -658,13 +658,13 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
 
             {type !== 'expense' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   {type === 'transfer' ? '转入账户' : '收款账户'}
                 </label>
                 <select 
                   value={toAccountId} 
                   onChange={e => setToAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                 >
                   {accounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name} (余额: ¥{acc.balance})</option>
@@ -677,29 +677,29 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           {/* Date & Note & Tags */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">日期</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">日期</label>
               <input 
                 type="datetime-local" 
                 value={date}
                 onChange={e => setDate(e.target.value)}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">备注</label>
               <input 
                 type="text" 
                 value={note}
                 onChange={e => setNote(e.target.value)}
                 placeholder="写点什么..."
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
               />
             </div>
           </div>
           
           {type === 'transfer' && !initialTransaction && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">转账手续费 (选填)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">转账手续费 (选填)</label>
               <input 
                 type="number" 
                 value={fee}
@@ -707,19 +707,19 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 placeholder="0.00"
                 step="0.01"
                 min="0"
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">标签 (用空格或逗号分隔)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">标签 (用空格或逗号分隔)</label>
             <input 
               type="text" 
               value={tagsInput}
               onChange={e => setTagsInput(e.target.value)}
               placeholder="例如: 旅游 聚餐"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm mb-2"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm mb-2"
             />
             {filteredAvailableTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -728,7 +728,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     key={tag}
                     type="button"
                     onClick={() => handleTagClick(tag)}
-                    className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200/50"
+                    className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-xs rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200/50"
                   >
                     {tag}
                   </button>
@@ -775,14 +775,14 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                   </button>
                 )}
               </div>
-              <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-100 rounded-xl p-2 bg-gray-50">
+              <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-100 dark:border-gray-700 rounded-xl p-2 bg-gray-50">
                 {transactions.filter(t => t.type === 'expense' && t.isReimbursable && (!t.isReimbursed || t.reimbursedByTxId === initialTransaction?.id)).length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-2">没有待报销的记录</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center py-2">没有待报销的记录</p>
                 ) : (
                   transactions
                     .filter(t => t.type === 'expense' && t.isReimbursable && (!t.isReimbursed || t.reimbursedByTxId === initialTransaction?.id))
                     .map(t => (
-                      <div key={t.id} className="flex items-center space-x-3 p-2 bg-white rounded-lg border border-gray-100">
+                      <div key={t.id} className="flex items-center space-x-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-100">
                         <input
                           type="checkbox"
                           checked={selectedReimbursableIds.includes(t.id)}
@@ -796,7 +796,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                           className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                             {format(parseISO(t.date), 'MM-dd')} {t.note || categories.find(c => c.id === t.categoryId)?.name}
                           </p>
                         </div>

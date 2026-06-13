@@ -122,16 +122,16 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div role="dialog" aria-modal="true" aria-labelledby="settings-title" className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700 shrink-0">
-          <h2 id="settings-title" className="text-xl font-bold text-gray-900 dark:text-gray-100">设置</h2>
-          <button onClick={handleClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+      <div role="dialog" aria-modal="true" aria-labelledby="settings-title" className="bg-white dark:bg-gray-800 dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700 shrink-0">
+          <h2 id="settings-title" className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100">设置</h2>
+          <button onClick={handleClose} className="p-2 text-gray-400 dark:text-gray-500 dark:text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700">
             <Icons.X size={24} />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-100 shrink-0">
+        <div className="flex border-b border-gray-100 dark:border-gray-700 shrink-0">
           {tabs.map(tab => (
             <button
               key={tab.key}
@@ -167,7 +167,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             <>
               {/* Storage Mode */}
               <div className="space-y-3">
-                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">数据存储位置</h3>
+                <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">数据存储位置</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={handleSwitchToCloud}
@@ -192,7 +192,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     <span className="font-medium text-xs">仅本地 (Localhost)</span>
                   </button>
                 </div>
-                <p className="text-[10px] text-gray-400 leading-normal">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-normal">
                   {syncSettings.storageMode === 'cloud'
                     ? '数据将安全地保存在云端，支持多设备同步。'
                     : '数据仅保存在当前设备，卸载应用或清空缓存会导致数据丢失。'}
@@ -202,7 +202,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               {/* Sync Frequency */}
               {syncSettings.storageMode === 'cloud' && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">同步频率</h3>
+                  <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">同步频率</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setSyncSettings({ syncFrequency: 'realtime' })}
@@ -227,7 +227,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                       <span className="font-medium text-xs">手动/每日同步</span>
                     </button>
                   </div>
-                  <p className="text-[10px] text-gray-400 leading-normal">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-normal">
                     {syncSettings.syncFrequency === 'realtime'
                       ? '任何修改都会立即同步到云端。'
                       : '修改将暂存本地，您可以手动点击下方按钮同步。'}
@@ -238,7 +238,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               {/* Manual Sync Buttons */}
               {(syncSettings.storageMode === 'local' || syncSettings.syncFrequency === 'daily') && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">手动云端同步</h3>
+                  <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">手动云端同步</h3>
                   <div className="flex space-x-3">
                     <button
                       onClick={handleManualPull}
@@ -267,15 +267,15 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Icons.Sparkles size={18} className="text-violet-600 animate-pulse" />
-                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">AI 智能助理密钥设置</h3>
+                <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">AI 智能助理密钥设置</h3>
               </div>
-              <p className="text-[10px] text-gray-400 leading-normal">
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-normal">
                 密钥仅保存在当前设备本地 (IndexedDB)。<strong>不会同步到云端</strong>，不会上传至任何第三方服务。BYOK（自带密钥）模式保障数据隐私。
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-500 mb-1">DeepSeek API Key (智能记账与理财助手)</label>
+                  <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">DeepSeek API Key (智能记账与理财助手)</label>
                   <div className="relative flex items-center">
                     <input
                       type={showDsKey ? 'text' : 'password'}
@@ -283,24 +283,24 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                       onChange={e => handleDsKeyChange(e.target.value)}
                       onBlur={handleDsBlur}
                       placeholder="sk-..."
-                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
+                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
                     />
                     <button
                       type="button"
                       onClick={() => setShowDsKey(!showDsKey)}
-                      className="absolute right-3 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600"
                     >
                       {showDsKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
                     </button>
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 flex items-center justify-between">
                     <span>没有密钥？点此去</span>
                     <a href="https://platform.deepseek.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">DeepSeek 开放平台注册获取 ➔</a>
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-500 mb-1">Qwen API Key (账单小票/截图视觉识别)</label>
+                  <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">Qwen API Key (账单小票/截图视觉识别)</label>
                   <div className="relative flex items-center">
                     <input
                       type={showQwKey ? 'text' : 'password'}
@@ -308,17 +308,17 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                       onChange={e => handleQwKeyChange(e.target.value)}
                       onBlur={handleQwBlur}
                       placeholder="sk-..."
-                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
+                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
                     />
                     <button
                       type="button"
                       onClick={() => setShowQwKey(!showQwKey)}
-                      className="absolute right-3 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600"
                     >
                       {showQwKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
                     </button>
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 flex items-center justify-between">
                     <span>没有密钥？点此去</span>
                     <a href="https://bailian.aliyun.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">阿里云百炼平台注册获取 ➔</a>
                   </p>
@@ -332,9 +332,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Icons.BellOff size={18} className="text-gray-500" />
-                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">已关闭的提示消息</h3>
+                <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">已关闭的提示消息</h3>
               </div>
-              <p className="text-[10px] text-gray-400 leading-normal">
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-normal">
                 当您在某条提示中选择"不再显示此类提示"后，该类提示将被永久关闭。您可以在此重新开启。
               </p>
 
@@ -360,7 +360,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2">
                               {isDismissed ? (
-                                <Icons.BellOff size={16} className="text-gray-400 shrink-0" />
+                                <Icons.BellOff size={16} className="text-gray-400 dark:text-gray-500 shrink-0" />
                               ) : (
                                 <Icons.Bell size={16} className="text-emerald-500 shrink-0" />
                               )}
@@ -368,7 +368,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                                 {ALERT_TYPE_LABELS[alertType] || alertType}
                               </span>
                             </div>
-                            <p className="text-[10px] text-gray-400 mt-1 ml-6">
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 ml-6">
                               {ALERT_TYPE_DESCRIPTIONS[alertType] || ''}
                             </p>
                           </div>
@@ -408,7 +408,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Icons.Sun size={18} className="text-amber-500" />
-                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">外观设置</h3>
+                <h3 className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">外观设置</h3>
               </div>
 
               <div className="space-y-2">
@@ -447,18 +447,18 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
       {/* Confirmation Modal */}
       {showConfirmSwitch && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-500 mb-4 mx-auto">
               <Icons.AlertCircle size={24} />
             </div>
-            <h3 className="text-lg font-bold text-center text-gray-900 mb-2">切换到云端同步</h3>
-            <p className="text-sm text-gray-500 text-center mb-6">
+            <h3 className="text-lg font-bold text-center text-gray-900 dark:text-gray-100 mb-2">切换到云端同步</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center mb-6">
               切换到云端同步可能会覆盖您在本地未同步的数据。建议您先进行数据备份。是否继续切换？
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowConfirmSwitch(false)}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                className="flex-1 py-3 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-200 transition-colors"
               >
                 取消
               </button>

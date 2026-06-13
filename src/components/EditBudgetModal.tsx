@@ -74,10 +74,10 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
+      <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700 shrink-0">
           <h2 className="text-xl font-bold text-gray-900">设置月度预算</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
             <X size={24} />
           </button>
         </div>
@@ -86,16 +86,16 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
           <form id="budget-form" onSubmit={handleSubmit} className="space-y-8">
             {/* Total Budget */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">总预算</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">总预算</label>
               <div className="flex items-center border-b-2 border-emerald-500 py-2">
-                <span className="text-3xl font-bold text-gray-900 mr-2">¥</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-gray-100 mr-2">¥</span>
                 <input 
                   type="number" 
                   step="0.01"
                   value={totalAmount}
                   onChange={e => setTotalAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full text-4xl font-bold text-gray-900 focus:outline-none placeholder-gray-300 bg-transparent"
+                  className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 focus:outline-none placeholder-gray-300 bg-transparent"
                   autoFocus
                 />
               </div>
@@ -116,18 +116,18 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
               
               <div className="space-y-3">
                 {catBudgets.map((cb, index) => (
-                  <div key={index} className="flex items-center space-x-2 bg-gray-50 p-2 rounded-xl border border-gray-100">
+                  <div key={index} className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 p-2 rounded-xl border border-gray-100">
                     <select
                       value={cb.categoryId}
                       onChange={(e) => handleCategoryBudgetChange(index, 'categoryId', e.target.value)}
-                      className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none"
+                      className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none"
                     >
                       {expenseCategories.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
-                    <div className="flex items-center bg-white px-2 py-1 rounded-lg border border-gray-200">
-                      <span className="text-gray-500 mr-1 text-sm">¥</span>
+                    <div className="flex items-center bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200">
+                      <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mr-1 text-sm">¥</span>
                       <input
                         type="number"
                         value={cb.amount}
@@ -146,7 +146,7 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
                   </div>
                 ))}
                 {catBudgets.length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-700 border-dashed">
                     暂无分类预算，点击上方按钮添加
                   </p>
                 )}
@@ -155,7 +155,7 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
           </form>
         </div>
 
-        <div className="p-6 border-t border-gray-100 shrink-0">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-700 shrink-0">
           <button 
             form="budget-form"
             type="submit"

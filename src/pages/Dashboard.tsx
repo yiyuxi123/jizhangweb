@@ -169,7 +169,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
   const renderSyncStatus = () => {
     if (isGuestMode) {
       return (
-        <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0">
+        <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 dark:text-gray-500 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0">
           <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
           <span>本地模式</span>
         </span>
@@ -179,7 +179,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
     switch (syncStatus) {
       case 'connecting':
         return (
-          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0 animate-pulse">
+          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0 animate-pulse">
             <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping" />
             <span>连接中...</span>
           </span>
@@ -223,7 +223,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
           <button 
             type="button"
             onClick={() => syncAllData()}
-            className="px-2 py-0.5 bg-gray-50 text-gray-500 hover:text-gray-700 text-[10px] rounded-full font-medium border border-gray-200/50 flex items-center space-x-1 shrink-0 hover:bg-gray-100 transition-colors"
+            className="px-2 py-0.5 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 text-[10px] rounded-full font-medium border border-gray-200/50 flex items-center space-x-1 shrink-0 hover:bg-gray-100 dark:bg-gray-700/50 transition-colors"
             title="点击同步数据"
           >
             <Icons.Cloud size={10} className="text-gray-400" />
@@ -266,20 +266,20 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       <div className="grid grid-cols-2 gap-4">
         <motion.div 
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
-          className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all"
+          className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
-          <div className="flex items-center space-x-2 text-gray-500 mb-2">
+          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
             <TrendingDown size={16} className="text-red-500" />
             <span className="text-sm font-medium">本月支出</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">¥{expense.toFixed(2)}</p>
-          <p className="text-xs text-gray-400 mt-1">日均 ¥{dailyAverage.toFixed(2)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">日均 ¥{dailyAverage.toFixed(2)}</p>
         </motion.div>
         <motion.div 
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
-          className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all"
+          className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
-          <div className="flex items-center space-x-2 text-gray-500 mb-2">
+          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
             <TrendingUp size={16} className="text-emerald-500" />
             <span className="text-sm font-medium">本月收入</span>
           </div>
@@ -325,17 +325,17 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       <motion.div 
         whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
         whileTap={{ scale: 0.98 }}
-        className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 cursor-pointer transition-all"
+        className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer transition-all"
         onClick={() => setIsBudgetModalOpen(true)}
       >
         <div className="flex justify-between items-end mb-2">
           <div>
-            <p className="text-sm text-gray-500 font-medium mb-1">剩余总预算</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium mb-1">剩余总预算</p>
             <p className="text-3xl font-bold text-gray-900">¥{budgetRemaining.toFixed(2)}</p>
           </div>
           <p className="text-sm text-gray-400">总预算 ¥{totalBudget}</p>
         </div>
-        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mt-4">
+        <div className="h-2 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden mt-4">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(budgetPercent, 100)}%` }}
@@ -346,7 +346,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
         
         {/* Category Budgets */}
         {categoryBudgets.length > 0 && (
-          <div className="mt-5 pt-4 border-t border-gray-100 space-y-3">
+          <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
             {categoryBudgets.map(cb => (
               <div key={cb.id}>
                 <div className="flex justify-between items-center mb-1">
@@ -358,7 +358,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                     ¥{cb.expense.toFixed(0)} / ¥{cb.amount.toFixed(0)}
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(cb.percent, 100)}%` }}
@@ -377,7 +377,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       {expensesByCategory.length > 0 && (
         <motion.div 
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
-          className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 transition-all"
+          className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
           <div className="flex items-center space-x-2 mb-4">
             <PieChartIcon size={18} className="text-indigo-500" />
@@ -415,7 +415,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="font-medium text-gray-900">¥{item.amount.toFixed(2)}</span>
-                  <span className="text-gray-400 text-xs w-8 text-right">
+                  <span className="text-gray-400 dark:text-gray-500 text-xs w-8 text-right">
                     {((item.amount / expense) * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -429,7 +429,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       {monthlyTrendData.length > 0 && (
         <motion.div 
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
-          className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 transition-all"
+          className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
           <div className="flex items-center space-x-2 mb-4">
             <BarChart3 size={18} className="text-blue-500" />
@@ -467,7 +467,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
           </button>
         </div>
         
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
           {recentTransactions.length === 0 ? (
             <div className="p-8 text-center text-gray-400">暂无记录，快去记一笔吧！</div>
           ) : (
@@ -479,7 +479,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                 return (
                   <div 
                     key={t.id} 
-                    className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="p-4 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-900 transition-colors cursor-pointer"
                     onClick={() => setSelectedTx(t)}
                   >
                     <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -490,7 +490,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                         {IconComponent && <IconComponent size={20} />}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 flex items-center space-x-2">
+                        <p className="font-medium text-gray-900 dark:text-gray-100 flex items-center space-x-2">
                           <span>{category?.name || '未知'}</span>
                           {t.isReimbursable && (
                             <span className={`px-1.5 py-0.5 text-[10px] rounded-sm font-medium shrink-0 ${t.isReimbursed ? 'bg-gray-100 text-gray-500' : 'bg-amber-100 text-amber-700'}`}>
@@ -499,9 +499,9 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                           )}
                         </p>
                         <div className="mt-0.5 flex flex-col space-y-1">
-                          <p className="text-xs text-gray-500 truncate">{format(new Date(t.date), 'MM-dd HH:mm')}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 truncate">{format(new Date(t.date), 'MM-dd HH:mm')}</p>
                           {t.note && (
-                            <p className="text-xs text-gray-600 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
+                            <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
                               {t.note}
                             </p>
                           )}

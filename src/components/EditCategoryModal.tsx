@@ -76,10 +76,10 @@ export default function EditCategoryModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="bg-white w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
+      <div className="bg-white dark:bg-gray-800 w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700 shrink-0">
           <h2 className="text-xl font-bold text-gray-900">{isNew ? '添加分类' : '编辑分类'}</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
             <X size={24} />
           </button>
         </div>
@@ -96,13 +96,13 @@ export default function EditCategoryModal({
                 <SelectedIcon size={32} />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">分类名称</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">分类名称</label>
                 <input 
                   type="text" 
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="输入分类名称"
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none font-medium"
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none font-medium"
                   required
                 />
               </div>
@@ -110,7 +110,7 @@ export default function EditCategoryModal({
 
             {/* Color Picker */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">选择颜色</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">选择颜色</label>
               <div className="grid grid-cols-6 gap-3">
                 {COLORS.map(c => (
                   <button
@@ -128,7 +128,7 @@ export default function EditCategoryModal({
 
             {/* Icon Picker */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">选择图标</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">选择图标</label>
               <div className="grid grid-cols-5 gap-3">
                 {currentIcons.map(i => {
                   const IconComp = (Icons as any)[i] || Icons.HelpCircle;
@@ -154,10 +154,10 @@ export default function EditCategoryModal({
             {/* Fixed Expense Toggle */}
             {defaultType === 'expense' && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
                   <div>
                     <h4 className="font-medium text-gray-900">固定支出</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">房租、订阅等每月固定的开销</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">房租、订阅等每月固定的开销</p>
                   </div>
                   <button
                     type="button"
@@ -168,10 +168,10 @@ export default function EditCategoryModal({
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
                   <div>
                     <h4 className="font-medium text-gray-900">不计入预算</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">此分类的消费不会占用总预算额度</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">此分类的消费不会占用总预算额度</p>
                   </div>
                   <button
                     type="button"
@@ -182,10 +182,10 @@ export default function EditCategoryModal({
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
                   <div>
                     <h4 className="font-medium text-gray-900">不计入统计</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">此分类的消费不会计入本月总支出</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">此分类的消费不会计入本月总支出</p>
                   </div>
                   <button
                     type="button"
@@ -201,7 +201,7 @@ export default function EditCategoryModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-100 bg-white shrink-0 space-y-3">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0 space-y-3">
           <button 
             type="submit"
             form="category-form"
@@ -216,7 +216,7 @@ export default function EditCategoryModal({
               <div className="space-y-3 pt-2 animate-in fade-in zoom-in-95 duration-200">
                 <p className="text-center text-red-500 font-medium text-sm">删除分类不会删除已有账单，确定删除吗？</p>
                 <div className="flex space-x-3">
-                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">
                     取消
                   </button>
                   <button type="button" onClick={handleDelete} className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">

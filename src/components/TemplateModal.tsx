@@ -101,14 +101,14 @@ export default function TemplateModal({
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
-        className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
-          <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+          <button type="button" onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full">
             <X size={20} />
           </button>
-          <h3 className="font-bold text-gray-900 text-sm">
+          <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">
             {templateToEdit ? '编辑快捷模板' : '新增快捷模板'}
           </h3>
           <div className="w-9" /> {/* Spacer */}
@@ -117,21 +117,21 @@ export default function TemplateModal({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Template Name */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">模板名称</label>
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">模板名称</label>
             <input
               type="text"
               required
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="如：工作午餐、地铁通勤"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium text-gray-900"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium text-gray-900"
             />
           </div>
 
           {/* Type Selection */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">账单类型</label>
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit">
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">账单类型</label>
+            <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl w-fit">
               {(['expense', 'income', 'transfer'] as const).map(t => (
                 <button
                   key={t}
@@ -149,9 +149,9 @@ export default function TemplateModal({
 
           {/* Default Amount */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">默认金额 (选填，输入0或空表示每次手动填写)</label>
+            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">默认金额 (选填，输入0或空表示每次手动填写)</label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-gray-400 font-bold text-sm">¥</span>
+              <span className="absolute left-3.5 text-gray-400 dark:text-gray-500 font-bold text-sm">¥</span>
               <input
                 type="number"
                 step="0.01"
@@ -159,7 +159,7 @@ export default function TemplateModal({
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-8 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                className="w-full pl-8 pr-3 py-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
               />
             </div>
           </div>
@@ -167,11 +167,11 @@ export default function TemplateModal({
           {/* Category */}
           {type !== 'transfer' && (
             <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">分类</label>
+              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">分类</label>
               <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
               >
                 {filteredCategories.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -184,13 +184,13 @@ export default function TemplateModal({
           <div className="space-y-4">
             {type !== 'income' && (
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">
                   {type === 'transfer' ? '转出账户' : '付款账户'}
                 </label>
                 <select
                   value={fromAccountId}
                   onChange={e => setFromAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
                 >
                   {accounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name}</option>
@@ -201,13 +201,13 @@ export default function TemplateModal({
 
             {type !== 'expense' && (
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">
                   {type === 'transfer' ? '转入账户' : '收款账户'}
                 </label>
                 <select
                   value={toAccountId}
                   onChange={e => setToAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
                 >
                   {accounts.map(acc => (
                     <option key={acc.id} value={acc.id}>{acc.name}</option>
@@ -220,23 +220,23 @@ export default function TemplateModal({
           {/* Note & Tags */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">默认备注</label>
+              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">默认备注</label>
               <input
                 type="text"
                 value={note}
                 onChange={e => setNote(e.target.value)}
                 placeholder="默认备注内容..."
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">默认标签 (空格分隔)</label>
+              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">默认标签 (空格分隔)</label>
               <input
                 type="text"
                 value={tagsInput}
                 onChange={e => setTagsInput(e.target.value)}
                 placeholder="例如: 餐饮 团建"
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
+                className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-900"
               />
             </div>
           </div>

@@ -78,15 +78,15 @@ export default function TransactionCalendar() {
   return (
     <div className="space-y-6">
       {/* Calendar Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 dark:bg-gray-700/50 rounded-full transition-colors">
             <ChevronLeft size={20} className="text-gray-600" />
           </button>
           <h2 className="text-lg font-bold text-gray-900">
             {format(currentMonth, 'yyyy年MM月')}
           </h2>
-          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 dark:bg-gray-700/50 rounded-full transition-colors">
             <ChevronRight size={20} className="text-gray-600" />
           </button>
         </div>
@@ -94,7 +94,7 @@ export default function TransactionCalendar() {
         {/* Days of Week */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {['一', '二', '三', '四', '五', '六', '日'].map(day => (
-            <div key={day} className="text-center text-xs font-medium text-gray-400 py-1">
+            <div key={day} className="text-center text-xs font-medium text-gray-400 dark:text-gray-500 py-1">
               {day}
             </div>
           ))}
@@ -171,12 +171,12 @@ export default function TransactionCalendar() {
       </div>
 
       {/* Selected Day Transactions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 flex justify-between items-center border-b border-gray-100">
           <h3 className="font-bold text-gray-900">
             {format(selectedDate, 'MM月dd日')} {isToday(selectedDate) && <span className="text-xs font-normal text-emerald-500 ml-1">今天</span>}
           </h3>
-          <div className="text-xs text-gray-500 flex space-x-3">
+          <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 flex space-x-3">
             <span>支 {`¥${selectedDayExpense.toFixed(2)}`}</span>
             <span>收 {`¥${selectedDayIncome.toFixed(2)}`}</span>
           </div>
@@ -184,7 +184,7 @@ export default function TransactionCalendar() {
 
         <div className="divide-y divide-gray-50">
           {selectedDayTransactions.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">
               这一天没有记账记录
             </div>
           ) : (
@@ -197,7 +197,7 @@ export default function TransactionCalendar() {
               return (
                 <div 
                   key={t.id} 
-                  className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="p-4 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-900 transition-colors cursor-pointer"
                   onClick={() => setSelectedTx(t)}
                 >
                   <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -208,21 +208,21 @@ export default function TransactionCalendar() {
                       {IconComponent && <IconComponent size={20} />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-900 flex items-center space-x-2">
+                      <p className="font-medium text-gray-900 dark:text-gray-100 flex items-center space-x-2">
                         <span>{t.type === 'transfer' ? '转账' : category?.name || '未知'}</span>
                         {t.isReimbursable && (
                           <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] rounded-sm font-medium shrink-0">可报销</span>
                         )}
                       </p>
                       <div className="mt-0.5 flex flex-col space-y-1">
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 truncate">
                           {format(parseISO(t.date), 'HH:mm')}
                           {t.type === 'transfer' && fromAccount && toAccount && ` | ${fromAccount.name} -> ${toAccount.name}`}
                           {t.type !== 'transfer' && fromAccount && ` | ${fromAccount.name}`}
                           {t.type !== 'transfer' && toAccount && ` | ${toAccount.name}`}
                         </p>
                         {t.note && (
-                          <p className="text-xs text-gray-600 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
+                          <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
                             {t.note}
                           </p>
                         )}

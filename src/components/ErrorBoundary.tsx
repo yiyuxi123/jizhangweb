@@ -42,14 +42,14 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 text-center select-none font-sans">
-          <div role="alert" className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-gray-100 flex flex-col items-center animate-in zoom-in-95 duration-200">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6 text-center select-none font-sans">
+          <div role="alert" className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl max-w-md w-full border border-gray-100 dark:border-gray-700 flex flex-col items-center animate-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6 text-red-500">
               <Icons.AlertTriangle size={36} />
             </div>
             
-            <h1 className="text-xl font-bold text-gray-900 mb-2">抱歉，应用发生严重错误</h1>
-            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">抱歉，应用发生严重错误</h1>
+            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm mb-6 leading-relaxed">
               系统遇到一个无法自动恢复的运行时异常。请尝试重新加载，或在必要时重置本地缓存。
             </p>
             

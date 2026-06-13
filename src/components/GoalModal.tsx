@@ -98,11 +98,11 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+          className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         >
-          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50">
             <h2 className="text-xl font-bold text-gray-900">{goal ? '编辑目标' : '新建存钱目标'}</h2>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+            <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:bg-gray-700/50 transition-colors">
               <Icons.X size={20} />
             </button>
           </div>
@@ -113,10 +113,10 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
                   <Icons.AlertTriangle size={32} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">确定要删除此目标吗？</h3>
-                <p className="text-gray-500 mb-6 text-sm">此操作不可恢复。</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">确定要删除此目标吗？</h3>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6 text-sm">此操作不可恢复。</p>
                 <div className="flex space-x-3">
-                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">
                     取消
                   </button>
                   <button type="button" onClick={handleDelete} className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-sm shadow-red-500/30">
@@ -127,20 +127,20 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
             ) : (
               <form id="goal-form" onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">目标名称</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">目标名称</label>
                   <input 
                     type="text" 
                     required
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="例如：买车、旅游"
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                    className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">目标金额</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">目标金额</label>
                     <div 
                       className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-all cursor-pointer ${activeInput === 'target' ? 'ring-2 ring-emerald-500 border-emerald-500' : 'border-gray-200'}`}
                       onClick={() => setActiveInput('target')}
@@ -149,7 +149,7 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">已存金额</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">已存金额</label>
                     <div 
                       className={`w-full p-3 bg-gray-50 border rounded-xl outline-none transition-all ${accountId ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${activeInput === 'current' ? 'ring-2 ring-emerald-500 border-emerald-500' : 'border-gray-200'}`}
                       onClick={() => !accountId && setActiveInput('current')}
@@ -160,11 +160,11 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">关联账户 (选填)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">关联账户 (选填)</label>
                   <select 
                     value={accountId} 
                     onChange={e => setAccountId(e.target.value)}
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                    className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
                   >
                     <option value="">不关联账户</option>
                     {accounts.map(acc => (
@@ -174,17 +174,17 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">目标日期 (选填)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">目标日期 (选填)</label>
                   <input 
                     type="date" 
                     value={deadline}
                     onChange={e => setDeadline(e.target.value)}
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                    className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">图标</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">图标</label>
                   <div className="grid grid-cols-4 gap-3">
                     {AVAILABLE_ICONS.map(i => {
                       const IconComponent = (Icons as any)[i];
@@ -203,7 +203,7 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">颜色</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">颜色</label>
                   <div className="flex space-x-3 overflow-x-auto py-3 px-2 -mx-2 scrollbar-hide">
                     {COLORS.map(c => (
                       <button
@@ -223,12 +223,12 @@ export default function GoalModal({ isOpen, onClose, goal }: Props) {
           </div>
 
           {!showConfirm && !activeInput && (
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex space-x-3">
+            <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex space-x-3">
               {goal && (
                 <button 
                   type="button"
                   onClick={() => setShowConfirm(true)}
-                  className="px-4 py-3 bg-white border border-gray-200 text-red-500 font-bold rounded-xl hover:bg-red-50 transition-colors"
+                  className="px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-red-500 font-bold rounded-xl hover:bg-red-50 transition-colors"
                 >
                   <Icons.Trash2 size={20} />
                 </button>

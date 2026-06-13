@@ -65,33 +65,33 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 p-6">
+      <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">编辑账户</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
             <X size={24} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">账户名称</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">账户名称</label>
             <input 
               type="text" 
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="例如：招商银行储蓄卡"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">账户类型</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">账户类型</label>
             <select 
               value={type} 
               onChange={e => setType(e.target.value as any)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
             >
               <option value="bank">银行卡</option>
               <option value="cash">现金</option>
@@ -103,11 +103,11 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">资金分类</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">资金分类</label>
             <select 
               value={fundType} 
               onChange={e => setFundType(e.target.value as any)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
             >
               <option value="working">流动资金 (现金/微信/支付宝/储蓄卡等)</option>
               <option value="investment">投资资金 (股票/基金/理财等)</option>
@@ -116,21 +116,21 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">当前余额</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">当前余额</label>
             <input 
               type="number" 
               step="0.01"
               value={balance}
               onChange={e => setBalance(e.target.value)}
               placeholder="0.00"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
             <div>
               <h4 className="font-medium text-gray-900">折叠账户</h4>
-              <p className="text-xs text-gray-500 mt-0.5">在资产列表中折叠显示此账户</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">在资产列表中折叠显示此账户</p>
             </div>
             <button
               type="button"
@@ -142,21 +142,21 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
           </div>
 
           {type === 'auto_deposit' && (
-            <div className="space-y-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
               <h4 className="font-medium text-gray-900">自动入账设置</h4>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">每月入账金额</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">每月入账金额</label>
                 <input 
                   type="number" 
                   step="0.01"
                   value={autoDepositAmount}
                   onChange={e => setAutoDepositAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                  className="w-full p-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">每月入账日 (1-31)</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">每月入账日 (1-31)</label>
                 <input 
                   type="number" 
                   min="1"
@@ -164,7 +164,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
                   value={autoDepositDay}
                   onChange={e => setAutoDepositDay(e.target.value)}
                   placeholder="15"
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                  className="w-full p-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
                 />
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
               <div className="space-y-3 pt-4 border-t border-gray-100">
                 <p className="text-center text-red-500 font-medium text-sm">删除账户将无法恢复，确定删除吗？</p>
                 <div className="flex space-x-3">
-                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                  <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">
                     取消
                   </button>
                   <button type="button" onClick={handleDelete} className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">

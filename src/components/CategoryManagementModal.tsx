@@ -98,7 +98,7 @@ export default function CategoryManagementModal({ onClose }: { onClose: () => vo
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="bg-white w-full max-w-md h-[80vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300">
+      <div className="bg-white dark:bg-gray-800 w-full max-w-md h-[80vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300">
         <div className="flex justify-between items-center p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900">分类管理</h2>
           <div className="flex items-center space-x-2">
@@ -108,7 +108,7 @@ export default function CategoryManagementModal({ onClose }: { onClose: () => vo
             >
               {isReordering ? '完成排序' : '排序'}
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+            <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
               <X size={24} />
             </button>
           </div>
@@ -153,7 +153,7 @@ export default function CategoryManagementModal({ onClose }: { onClose: () => vo
           
           <button 
             onClick={() => setEditingCategory('new')}
-            className="w-full py-4 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 font-medium flex items-center justify-center space-x-2 hover:bg-gray-50 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
+            className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium flex items-center justify-center space-x-2 hover:bg-gray-50 dark:bg-gray-900 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
           >
             <Plus size={20} />
             <span>添加新分类</span>

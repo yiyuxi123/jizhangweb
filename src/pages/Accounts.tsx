@@ -511,7 +511,7 @@ export default function Accounts() {
           {accounts.some(a => a.isHidden) && (
             <div className="pt-2">
               <details className="group">
-                <summary className="flex items-center justify-between cursor-pointer list-none text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors py-2">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 transition-colors py-2">
                   <span>折叠的账户 ({accounts.filter(a => a.isHidden).length})</span>
                   <Icons.ChevronDown size={16} className="transition-transform group-open:-rotate-180" />
                 </summary>
@@ -551,11 +551,11 @@ export default function Accounts() {
         </div>
         
         {goals.length === 0 ? (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-center">
             <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <Icons.Target size={24} className="text-emerald-500" />
             </div>
-            <p className="text-gray-500 text-sm">还没有存钱目标，定个小目标吧！</p>
+            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm">还没有存钱目标，定个小目标吧！</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3">
@@ -573,7 +573,7 @@ export default function Accounts() {
                   whileHover={{ scale: 1.02, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
                   whileTap={{ scale: 0.98 }}
                   key={goal.id} 
-                  className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 cursor-pointer transition-all"
+                  className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer transition-all"
                   onClick={() => setSelectedGoal(goal)}
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -587,7 +587,7 @@ export default function Accounts() {
                       <div>
                         <h4 className="font-bold text-gray-900">{goal.name}</h4>
                         {goal.deadline && (
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
                             目标日期: {goal.deadline.split('T')[0]}
                           </p>
                         )}
@@ -595,10 +595,10 @@ export default function Accounts() {
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-gray-900">¥{currentAmount.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">/ ¥{goal.targetAmount.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">/ ¥{goal.targetAmount.toFixed(2)}</p>
                     </div>
                   </div>
-                  <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${percent}%` }}
@@ -622,7 +622,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsCategoryOpen(true)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Icons.Tags size={24} className="text-purple-500" />
             <span className="text-sm font-medium">分类管理</span>
@@ -631,7 +631,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsManageTemplatesOpen(true)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Icons.Zap size={24} className="text-yellow-500" />
             <span className="text-sm font-medium">模板管理</span>
@@ -640,7 +640,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleExportTransactions}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Download size={24} className="text-emerald-500" />
             <span className="text-sm font-medium">导出账单</span>
@@ -649,7 +649,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleExportAccounts}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Download size={24} className="text-blue-500" />
             <span className="text-sm font-medium">导出资产</span>
@@ -658,7 +658,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleBackup}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Icons.Save size={24} className="text-indigo-500" />
             <span className="text-sm font-medium">备份数据</span>
@@ -674,7 +674,7 @@ export default function Accounts() {
             <motion.div 
               whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white h-full p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+              className="bg-white dark:bg-gray-800 h-full p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
             >
               <Icons.Upload size={24} className="text-orange-500" />
               <span className="text-sm font-medium">恢复数据</span>
@@ -684,7 +684,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleClearAll}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-red-100 flex flex-col items-center justify-center space-y-2 transition-all text-red-600 hover:bg-red-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-red-100 flex flex-col items-center justify-center space-y-2 transition-all text-red-600 hover:bg-red-50"
           >
             <Icons.Trash2 size={24} className="text-red-500" />
             <span className="text-sm font-medium">清空数据</span>
@@ -693,7 +693,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsGuideOpen(true)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
           >
             <Icons.BookOpen size={24} className="text-emerald-500" />
             <span className="text-sm font-medium">使用说明</span>
@@ -702,7 +702,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsSettingsOpen(true)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Icons.Settings size={24} className="text-slate-500" />
             <span className="text-sm font-medium">同步设置</span>
@@ -711,7 +711,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsDonationOpen(true)}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center space-y-2 transition-all text-pink-600 hover:bg-pink-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center space-y-2 transition-all text-pink-600 hover:bg-pink-50"
           >
             <Icons.Heart size={24} className="text-pink-500" />
             <span className="text-sm font-medium">赞赏支持</span>
@@ -726,7 +726,7 @@ export default function Accounts() {
                   useStore.getState().setIsGuestMode(true);
                 });
               }}
-              className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 hover:bg-gray-50"
+              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-50"
             >
               <Icons.LogOut size={24} className="text-gray-500" />
               <span className="text-sm font-medium">退出登录</span>
@@ -738,7 +738,7 @@ export default function Accounts() {
               onClick={() => {
                 import('../firebase').then(({ loginWithGoogle }) => loginWithGoogle());
               }}
-              className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
+              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
             >
               <Icons.LogIn size={24} className="text-emerald-500" />
               <span className="text-sm font-medium">登录同步</span>
@@ -762,17 +762,17 @@ export default function Accounts() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-2">确认恢复数据</h3>
-            <p className="text-gray-500 mb-6">恢复数据将覆盖当前所有数据，确定要继续吗？</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">确认恢复数据</h3>
+            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6">恢复数据将覆盖当前所有数据，确定要继续吗？</p>
             <div className="flex space-x-3">
               <button 
                 onClick={() => {
                   setShowRestoreConfirm(false);
                   setRestoreData(null);
                 }}
-                className="flex-1 py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex-1 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 transition-colors"
               >
                 取消
               </button>
@@ -793,14 +793,14 @@ export default function Accounts() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
           >
             <h3 className="text-xl font-bold text-red-600 mb-2">警告：清空数据</h3>
-            <p className="text-gray-500 mb-6">此操作将清空所有账户、账单和分类数据，且不可恢复！确定要继续吗？</p>
+            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6">此操作将清空所有账户、账单和分类数据，且不可恢复！确定要继续吗？</p>
             <div className="flex space-x-3">
               <button 
                 onClick={() => setShowClearConfirm(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex-1 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 transition-colors"
               >
                 取消
               </button>
@@ -821,14 +821,14 @@ export default function Accounts() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border-2 border-red-500"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl border-2 border-red-500"
           >
             <h3 className="text-xl font-bold text-red-600 mb-2">最后确认</h3>
-            <p className="text-gray-700 font-medium mb-6">再次确认：您真的要清空所有数据吗？</p>
+            <p className="text-gray-700 dark:text-gray-200 font-medium mb-6">再次确认：您真的要清空所有数据吗？</p>
             <div className="flex space-x-3">
               <button 
                 onClick={() => setShowClearConfirm2(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex-1 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 transition-colors"
               >
                 取消
               </button>

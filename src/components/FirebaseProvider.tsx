@@ -330,12 +330,12 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
   } else if (!isUserAuthenticated && !isGuestMode) {
     content = (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
           <Wallet size={40} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">欢迎使用记账本</h1>
-        <p className="text-gray-500 mb-8 text-center max-w-sm">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">欢迎使用记账本</h1>
+        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-8 text-center max-w-sm">
           记录点滴，理清财务。请登录以同步您的账单数据。
         </p>
         
@@ -351,7 +351,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             <button
               onClick={loginWithGoogle}
               aria-label="使用 Google 账号登录"
-              className="w-full px-8 py-4 bg-white border border-gray-200 rounded-xl shadow-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center space-x-3"
+              className="w-full px-8 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-gray-900 transition-colors flex items-center justify-center space-x-3"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
               <span>使用 Google 账号登录</span>
@@ -359,7 +359,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             
             <div className="relative flex items-center py-2">
               <div className="flex-grow border-t border-gray-200"></div>
-              <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">或者</span>
+              <span className="flex-shrink-0 mx-4 text-gray-400 dark:text-gray-500 text-sm">或者</span>
               <div className="flex-grow border-t border-gray-200"></div>
             </div>
  
@@ -383,12 +383,12 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {content}
       {alertMessage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-500 mb-4 mx-auto">
               <Icons.AlertCircle size={24} />
             </div>
-            <h3 className="text-lg font-bold text-center text-gray-900 mb-2">网络及云同步提示</h3>
-            <p className="text-sm text-gray-500 text-center mb-4 leading-relaxed">{alertMessage}</p>
+            <h3 className="text-lg font-bold text-center text-gray-900 dark:text-gray-100 mb-2">网络及云同步提示</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center mb-4 leading-relaxed">{alertMessage}</p>
 
             {/* Don't show again checkbox */}
             <label className="flex items-center justify-center space-x-2 mb-4 cursor-pointer">

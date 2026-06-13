@@ -23,14 +23,14 @@ export default function ManageTemplatesModal({
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
-        className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden h-[75vh] flex flex-col"
+        className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden h-[75vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
-          <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
+          <button type="button" onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full">
             <X size={20} />
           </button>
-          <h3 className="font-bold text-gray-900 text-sm flex items-center space-x-1">
+          <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm flex items-center space-x-1">
             <Zap size={16} className="text-yellow-500 fill-yellow-500" />
             <span>管理快捷记账模板</span>
           </h3>
@@ -62,7 +62,7 @@ export default function ManageTemplatesModal({
               return (
                 <div
                   key={tpl.id}
-                  className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     <div
@@ -72,8 +72,8 @@ export default function ManageTemplatesModal({
                       {IconComponent && <IconComponent size={20} />}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-sm text-gray-900 truncate">{tpl.name}</p>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">
+                      <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">{tpl.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
                         {tpl.type === 'expense' ? '支出' : tpl.type === 'income' ? '收入' : '转账'}
                         {tpl.amount ? ` · 预设金额 ¥${tpl.amount}` : ' · 每次输入金额'}
                       </p>
@@ -85,7 +85,7 @@ export default function ManageTemplatesModal({
                       setSelectedTemplate(tpl);
                       setIsEditorOpen(true);
                     }}
-                    className="p-2 text-gray-400 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
+                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 rounded-full hover:bg-gray-100 dark:bg-gray-700/50 transition-colors"
                   >
                     <Edit2 size={16} />
                   </button>

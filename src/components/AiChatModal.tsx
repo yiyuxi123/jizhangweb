@@ -98,7 +98,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
             inTable = false;
 
             return (
-              <div key={`table-${idx}`} className="overflow-x-auto my-3 border border-gray-200 rounded-xl">
+              <div key={`table-${idx}`} className="overflow-x-auto my-3 border border-gray-200 dark:border-gray-700 rounded-xl">
                 <table className="min-w-full divide-y divide-gray-200 text-xs">
                   <thead className="bg-gray-50">
                     <tr>
@@ -107,7 +107,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200 text-gray-600">
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 text-gray-600">
                     {rows.map((row, rIdx) => (
                       <tr key={rIdx}>
                         {row.map((cell, cIdx) => (
@@ -139,21 +139,21 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
       const parts = lineText.split('**');
       const formattedText = parts.map((part, i) => {
         if (i % 2 === 1) {
-          return <strong key={i} className="font-extrabold text-gray-900 bg-emerald-50 px-0.5 rounded">{part}</strong>;
+          return <strong key={i} className="font-extrabold text-gray-900 dark:text-gray-100 bg-emerald-50 px-0.5 rounded">{part}</strong>;
         }
         return part;
       });
 
       if (isListItem) {
         return (
-          <li key={idx} className="ml-4 list-disc text-sm text-gray-800 my-1">
+          <li key={idx} className="ml-4 list-disc text-sm text-gray-800 dark:text-gray-200 my-1">
             {formattedText}
           </li>
         );
       }
 
       return (
-        <p key={idx} className="text-sm text-gray-800 my-1.5 leading-relaxed">
+        <p key={idx} className="text-sm text-gray-800 dark:text-gray-200 my-1.5 leading-relaxed">
           {formattedText}
         </p>
       );
@@ -168,20 +168,20 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-gray-50 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden h-[85vh] flex flex-col"
+          className="bg-gray-50 dark:bg-gray-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden h-[85vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex justify-between items-center p-4 bg-white border-b border-gray-100 shrink-0">
+          <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shrink-0">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white">
                 <Icons.Sparkles size={16} className="text-yellow-300" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-sm">AI 智能财务助手</h3>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">AI 智能财务助手</h3>
                 <span className="text-[10px] text-emerald-500 font-medium">DeepSeek-V3 引擎已连接</span>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+            <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
               <Icons.X size={20} />
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white text-gray-400 border border-gray-100 rounded-2xl rounded-tl-none p-3 shadow-sm flex items-center space-x-2">
+                <div className="bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-none p-3 shadow-sm flex items-center space-x-2">
                   <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                   <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -221,12 +221,12 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
 
           {/* Prompt Suggestions */}
           {messages.length === 1 && !loading && (
-            <div className="px-4 py-2 bg-gray-50 flex flex-wrap gap-2 border-t border-gray-100 shrink-0">
+            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 flex flex-wrap gap-2 border-t border-gray-100 dark:border-gray-700 shrink-0">
               {suggestionChips.map((chip, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(chip)}
-                  className="px-2.5 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 text-xs text-gray-600 font-medium rounded-full transition-colors shadow-sm"
+                  className="px-2.5 py-1.5 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 font-medium rounded-full transition-colors shadow-sm"
                 >
                   {chip}
                 </button>
@@ -235,14 +235,14 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Input Panel */}
-          <div className="p-4 bg-white border-t border-gray-100 shrink-0 flex items-center space-x-2">
+          <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 shrink-0 flex items-center space-x-2">
             <input
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend(input)}
               placeholder="向 AI 财务助手提问..."
-              className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+              className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
             />
             <button
               onClick={() => handleSend(input)}

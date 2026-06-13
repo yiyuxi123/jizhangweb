@@ -258,7 +258,7 @@ export default function Statistics() {
         
         {/* Period & Type Controls */}
         <div className="space-y-3">
-          <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full max-w-xs mx-auto">
+          <div className="flex space-x-2 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl w-full max-w-xs mx-auto">
             {(['month', 'year'] as const).map(p => (
               <button
                 key={p}
@@ -274,17 +274,17 @@ export default function Statistics() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between bg-white rounded-xl p-2 shadow-sm border border-gray-100">
-            <button onClick={handlePrev} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+          <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-2 shadow-sm border border-gray-100">
+            <button onClick={handlePrev} className="p-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:bg-gray-700/50 rounded-lg transition-colors">
               <ChevronLeft size={20} />
             </button>
             <span className="font-bold text-gray-900">{dateLabel}</span>
-            <button onClick={handleNext} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+            <button onClick={handleNext} className="p-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:bg-gray-700/50 rounded-lg transition-colors">
               <ChevronRight size={20} />
             </button>
           </div>
 
-          <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full max-w-xs mx-auto">
+          <div className="flex space-x-2 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl w-full max-w-xs mx-auto">
             {(['expense', 'income'] as const).map(t => (
               <button
                 key={t}
@@ -302,7 +302,7 @@ export default function Statistics() {
 
           {/* Metrics Toggles */}
           <div className="mt-6">
-            <p className="text-xs font-medium text-gray-400 mb-3 px-1">显示模块</p>
+            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-3 px-1">显示模块</p>
             <div className="flex overflow-x-auto pb-2 -mx-4 px-4 space-x-2 scrollbar-hide">
               {METRICS_CONFIG.map(metric => {
                 if ('expenseOnly' in metric && metric.expenseOnly && type !== 'expense') return null;
@@ -333,9 +333,9 @@ export default function Statistics() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-center"
+        className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 text-center"
       >
-        <p className="text-gray-500 text-sm font-medium mb-2">{period === 'month' ? '本月' : '本年'}总{type === 'expense' ? '支出' : '收入'}</p>
+        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm font-medium mb-2">{period === 'month' ? '本月' : '本年'}总{type === 'expense' ? '支出' : '收入'}</p>
         <h2 className={`text-4xl font-bold ${type === 'expense' ? 'text-gray-900' : 'text-emerald-500'}`}>
           ¥{total.toFixed(2)}
         </h2>
@@ -401,9 +401,9 @@ export default function Statistics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100"
+            className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4 px-2">分类占比</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 px-2">分类占比</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -441,7 +441,7 @@ export default function Statistics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mt-6"
+              className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 mt-6"
             >
               <div className="flex justify-between items-center mb-4 px-2">
                 <h3 className="text-lg font-bold text-gray-900">日均统计</h3>
@@ -487,21 +487,21 @@ export default function Statistics() {
                           <IconComponent size={16} />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900 text-sm">{item.name}</p>
+                          <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{item.name}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-gray-900">¥{dailyAvg.toFixed(2)}<span className="text-xs text-gray-500 font-normal"> /天</span></p>
+                        <p className="font-bold text-gray-900">¥{dailyAvg.toFixed(2)}<span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 font-normal"> /天</span></p>
                       </div>
                     </div>
                   );
                 })}
                 
-                <div className="pt-3 mt-3 border-t border-gray-100 flex justify-between items-center px-2">
+                <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center px-2">
                   <span className="font-bold text-gray-900">合计日均</span>
                   <span className="font-bold text-lg text-emerald-500">
                     ¥{(chartData.filter(c => dailyAverageCategories.length === 0 || dailyAverageCategories.includes(c.name)).reduce((sum, c) => sum + c.value, 0) / Math.max(1, period === 'month' ? new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate() : (isWithinInterval(new Date(), { start, end }) ? Math.ceil((new Date().getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) : 365))).toFixed(2)}
-                    <span className="text-sm text-gray-500 font-normal"> /天</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 font-normal"> /天</span>
                   </span>
                 </div>
               </div>
@@ -515,7 +515,7 @@ export default function Statistics() {
               const percent = ((item.value / total) * 100).toFixed(1);
               
               return (
-                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:bg-gray-900 rounded-xl transition-colors">
                   <div className="flex items-center space-x-3">
                     <div 
                       className="w-10 h-10 rounded-full flex items-center justify-center text-white"
@@ -542,7 +542,7 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center text-gray-400"
+          className="bg-white dark:bg-gray-800 p-12 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 text-center text-gray-400"
         >
           暂无数据
         </motion.div>
@@ -555,9 +555,9 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100"
+          className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 px-2">固定 vs 浮动支出</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 px-2">固定 vs 浮动支出</h3>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -606,9 +606,9 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100"
+          className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 px-2">收支趋势</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 px-2">收支趋势</h3>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData}>
@@ -640,9 +640,9 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100"
+          className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 px-2">总资产趋势 (近12个月)</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 px-2">总资产趋势 (近12个月)</h3>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={assetTrendData}>
@@ -690,9 +690,9 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100"
+          className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 px-2">账户分布</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 px-2">账户分布</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -730,7 +730,7 @@ export default function Statistics() {
               const percent = ((item.value / total) * 100).toFixed(1);
               
               return (
-                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:bg-gray-900 rounded-xl transition-colors">
                   <div className="flex items-center space-x-3">
                     <div 
                       className="w-10 h-10 rounded-full flex items-center justify-center text-white"
@@ -757,7 +757,7 @@ export default function Statistics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center text-gray-400"
+          className="bg-white dark:bg-gray-800 p-12 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 text-center text-gray-400"
         >
           暂无数据
         </motion.div>
@@ -769,7 +769,7 @@ export default function Statistics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100"
+            className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100"
           >
             <div className="flex items-center space-x-2 mb-6">
               <Icons.Tag size={20} className="text-purple-500" />
@@ -790,7 +790,7 @@ export default function Statistics() {
                       </div>
                       <span className="font-bold text-gray-900">¥{item.value.toFixed(2)}</span>
                     </div>
-                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${percent}%` }}

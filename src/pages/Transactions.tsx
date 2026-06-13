@@ -287,7 +287,7 @@ export default function Transactions() {
                 placeholder="搜索备注、分类、标签或金额..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
               />
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function Transactions() {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
+                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
               >
                 <option value="all">全部月份</option>
                 {availableMonths.map(month => (
@@ -305,13 +305,13 @@ export default function Transactions() {
                   </option>
                 ))}
               </select>
-              <Filter size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <Filter size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
             </div>
             <div className="relative flex-1">
               <select
                 value={selectedAccount}
                 onChange={(e) => setSelectedAccount(e.target.value)}
-                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
+                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
               >
                 <option value="all">全部账户</option>
                 {accounts.map(acc => (
@@ -320,7 +320,7 @@ export default function Transactions() {
                   </option>
                 ))}
               </select>
-              <Icons.CreditCard size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <Icons.CreditCard size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -356,7 +356,7 @@ export default function Transactions() {
             </button>
             <button 
               onClick={handleExportFiltered}
-              className="p-1.5 rounded-lg transition-colors bg-white border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              className="p-1.5 rounded-lg transition-colors bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 hover:bg-gray-50"
               title="导出当前筛选结果"
             >
               <Icons.Download size={16} />
@@ -372,7 +372,7 @@ export default function Transactions() {
         <div className="space-y-6" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
           {Object.entries(grouped).length === 0 ? (
             <div className="text-center py-12 text-gray-400">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search size={24} className="text-gray-300" />
               </div>
               <p>没有找到相关记录</p>
@@ -387,11 +387,11 @@ export default function Transactions() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={month} 
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"
                 >
                   {/* Month Header */}
                   <div 
-                    className="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="bg-gray-50 dark:bg-gray-900 px-4 py-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:bg-gray-700/50 transition-colors"
                     onClick={() => toggleMonthCollapse(month)}
                   >
                     <div className="flex items-center space-x-2">
@@ -401,7 +401,7 @@ export default function Transactions() {
                       />
                       <h3 className="font-bold text-gray-900">{format(parseISO(`${month}-01`), 'yyyy年MM月')}</h3>
                     </div>
-                    <div className="text-xs text-gray-500 flex space-x-3">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 flex space-x-3">
                       <span>支 ¥{monthExpense.toFixed(2)}</span>
                       <span>收 ¥{monthIncome.toFixed(2)}</span>
                     </div>
@@ -414,7 +414,7 @@ export default function Transactions() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="divide-y divide-gray-50 overflow-hidden"
+                        className="divide-y divide-gray-50 dark:divide-gray-700/50 overflow-hidden"
                       >
                         {monthTransactions.map(t => {
                           const category = categories.find(c => c.id === t.categoryId);
@@ -451,7 +451,7 @@ export default function Transactions() {
                               {IconComponent && <IconComponent size={20} />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-medium text-gray-900 flex items-center space-x-2">
+                              <p className="font-medium text-gray-900 dark:text-gray-100 flex items-center space-x-2">
                                 <span>{t.type === 'transfer' ? '转账' : category?.name || '未知'}</span>
                                 {t.isReimbursable && (
                                   <span className={`px-1.5 py-0.5 text-[10px] rounded-sm font-medium shrink-0 ${t.isReimbursed ? 'bg-gray-100 text-gray-500' : 'bg-amber-100 text-amber-700'}`}>
@@ -463,14 +463,14 @@ export default function Transactions() {
                                 )}
                               </p>
                               <div className="mt-0.5 flex flex-col space-y-1">
-                                <p className="text-xs text-gray-500 truncate">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 truncate">
                                   {format(parseISO(t.date), 'MM-dd HH:mm')}
                                   {t.type === 'transfer' && fromAccount && toAccount && ` | ${fromAccount.name} -> ${toAccount.name}`}
                                   {t.type !== 'transfer' && fromAccount && ` | ${fromAccount.name}`}
                                   {t.type !== 'transfer' && toAccount && ` | ${toAccount.name}`}
                                 </p>
                                 {t.note && (
-                                  <p className="text-xs text-gray-600 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
+                                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
                                     {t.note}
                                   </p>
                                 )}
@@ -558,14 +558,14 @@ export default function Transactions() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-2">确认删除</h3>
-              <p className="text-gray-500 mb-6">确定要删除选中的 {selectedIds.size} 条记录吗？此操作不可恢复。</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">确认删除</h3>
+              <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6">确定要删除选中的 {selectedIds.size} 条记录吗？此操作不可恢复。</p>
               <div className="flex space-x-3">
                 <button 
                   onClick={() => setShowBatchDeleteConfirm(false)}
-                  className="flex-1 py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-3 rounded-xl font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 transition-colors"
                 >
                   取消
                 </button>
