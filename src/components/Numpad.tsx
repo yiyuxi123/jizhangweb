@@ -10,9 +10,15 @@ interface NumpadProps {
 export default function Numpad({ value, onChange, onComplete }: NumpadProps) {
   const handleNumberClick = (num: string) => {
     if (num === '.' && value.includes('.')) return;
-    if (value === '' && num === '.') {
-      onChange('0.');
-      return;
+    if (value === '') {
+      if (num === '.') {
+        onChange('0.');
+        return;
+      }
+      if (num === '00' || num === '0') {
+        onChange('0');
+        return;
+      }
     }
     if (value === '0' && num !== '.') {
       onChange(num === '00' ? '0' : num);
