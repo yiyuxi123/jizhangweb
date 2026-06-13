@@ -59,9 +59,9 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
     'auto_deposit': '自动入账'
   };
   const fundTypeLabels: Record<string, { label: string, colorClass: string }> = {
-    'working': { label: '流动', colorClass: 'bg-blue-50 text-blue-600 border-blue-100/50' },
-    'investment': { label: '投资', colorClass: 'bg-purple-50 text-purple-600 border-purple-100/50' },
-    'unavailable': { label: '不可用', colorClass: 'bg-amber-50 text-amber-600 border-amber-100/50' }
+    'working': { label: '流动', colorClass: 'bg-blue-50 text-blue-600 border-blue-100/50 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30' },
+    'investment': { label: '投资', colorClass: 'bg-purple-50 text-purple-600 border-purple-100/50 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-900/30' },
+    'unavailable': { label: '不可用', colorClass: 'bg-amber-50 text-amber-600 border-amber-100/50 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30' }
   };
   const fundInfo = fundTypeLabels[account.fundType || 'working'];
 
@@ -69,7 +69,7 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
     <div 
       ref={setNodeRef}
       style={style}
-      className={`bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between transition-shadow hover:shadow-md ${isReordering ? 'cursor-grab active:cursor-grabbing select-none touch-none' : 'cursor-pointer'}`}
+      className={`bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between transition-shadow hover:shadow-md ${isReordering ? 'cursor-grab active:cursor-grabbing select-none touch-none' : 'cursor-pointer'}`}
       onClick={onClick}
       {...(isReordering ? { ...attributes, ...listeners } : {})}
     >
@@ -86,9 +86,9 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
           <IconComponent size={24} />
         </div>
         <div>
-          <h4 className="font-bold text-gray-900">{account.name}</h4>
+          <h4 className="font-bold text-gray-900 dark:text-gray-100">{account.name}</h4>
           <div className="flex items-center space-x-1.5 mt-0.5">
-            <span className="text-xs text-gray-500">{typeLabels[account.type] || account.type}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{typeLabels[account.type] || account.type}</span>
             <span className={`text-[10px] px-1 py-0.2 rounded border font-medium leading-none ${fundInfo.colorClass}`}>
               {fundInfo.label}
             </span>
@@ -96,7 +96,7 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
         </div>
       </div>
       <div className="text-right">
-        <p className={`font-bold text-lg ${account.balance < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+        <p className={`font-bold text-lg ${account.balance < 0 ? 'text-red-500' : 'text-gray-900 dark:text-gray-100'}`}>
           ¥{account.balance.toFixed(2)}
         </p>
       </div>
@@ -138,7 +138,7 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
     <div 
       ref={setNodeRef}
       style={style}
-      className={`bg-white/60 p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between transition-all opacity-75 hover:opacity-100 hover:shadow-md ${isReordering ? 'cursor-grab active:cursor-grabbing select-none touch-none' : 'cursor-pointer'}`}
+      className={`bg-white/60 dark:bg-gray-800/60 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between transition-all opacity-75 hover:opacity-100 hover:shadow-md ${isReordering ? 'cursor-grab active:cursor-grabbing select-none touch-none' : 'cursor-pointer'}`}
       onClick={onClick}
       {...(isReordering ? { ...attributes, ...listeners } : {})}
     >
@@ -155,9 +155,9 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
           <IconComponent size={24} />
         </div>
         <div>
-          <h4 className="font-bold text-gray-900">{account.name}</h4>
+          <h4 className="font-bold text-gray-900 dark:text-gray-100">{account.name}</h4>
           <div className="flex items-center space-x-1.5 mt-0.5">
-            <span className="text-xs text-gray-500">{typeLabels[account.type] || account.type}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{typeLabels[account.type] || account.type}</span>
             <span className={`text-[10px] px-1 py-0.2 rounded border font-medium leading-none ${fundInfo.colorClass}`}>
               {fundInfo.label}
             </span>
@@ -165,7 +165,7 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
         </div>
       </div>
       <div className="text-right">
-        <p className={`font-bold text-lg ${account.balance < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+        <p className={`font-bold text-lg ${account.balance < 0 ? 'text-red-500' : 'text-gray-900 dark:text-gray-100'}`}>
           ¥{account.balance.toFixed(2)}
         </p>
       </div>
@@ -432,10 +432,10 @@ export default function Accounts() {
     <div className="p-4 space-y-6 max-w-md mx-auto">
       {/* Header */}
       <header className="pt-4 pb-2 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">资产管理</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">资产管理</h1>
         <button 
           onClick={() => setIsAddOpen(true)}
-          className="p-2 bg-emerald-100 text-emerald-600 rounded-full hover:bg-emerald-200 transition-colors"
+          className="p-2 bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/30 transition-colors"
         >
           <Plus size={20} />
         </button>
@@ -476,10 +476,10 @@ export default function Accounts() {
       {/* Accounts List */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900">我的账户</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">我的账户</h3>
           <button 
             onClick={() => setIsReordering(!isReordering)}
-            className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${isReordering ? 'bg-emerald-100 text-emerald-700' : 'text-gray-500 hover:bg-gray-100'}`}
+            className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${isReordering ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           >
             {isReordering ? '完成排序' : '排序'}
           </button>
@@ -541,10 +541,10 @@ export default function Accounts() {
       {/* Goals List */}
       <div className="space-y-4 pt-2">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900">存钱目标</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">存钱目标</h3>
           <button 
             onClick={() => setIsAddGoalOpen(true)}
-            className="text-sm text-emerald-600 font-medium hover:text-emerald-700 transition-colors"
+            className="text-sm text-emerald-600 font-medium hover:text-emerald-700 dark:text-emerald-400 transition-colors"
           >
             添加目标
           </button>
@@ -585,17 +585,17 @@ export default function Accounts() {
                         <IconComponent size={20} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900">{goal.name}</h4>
+                        <h4 className="font-bold text-gray-900 dark:text-gray-100">{goal.name}</h4>
                         {goal.deadline && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                             目标日期: {goal.deadline.split('T')[0]}
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900">¥{currentAmount.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">/ ¥{goal.targetAmount.toFixed(2)}</p>
+                      <p className="font-bold text-gray-900 dark:text-gray-100">¥{currentAmount.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">/ ¥{goal.targetAmount.toFixed(2)}</p>
                     </div>
                   </div>
                   <div className="h-2 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden">
@@ -616,52 +616,52 @@ export default function Accounts() {
 
       {/* Data Management */}
       <div className="space-y-4 pt-4">
-        <h3 className="text-lg font-bold text-gray-900">系统设置</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">系统设置</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsCategoryOpen(true)}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Icons.Tags size={24} className="text-purple-500" />
-            <span className="text-sm font-medium">分类管理</span>
+            <span className="text-sm font-medium dark:text-gray-200">分类管理</span>
           </motion.button>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsManageTemplatesOpen(true)}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Icons.Zap size={24} className="text-yellow-500" />
-            <span className="text-sm font-medium">模板管理</span>
+            <span className="text-sm font-medium dark:text-gray-200">模板管理</span>
           </motion.button>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleExportTransactions}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Download size={24} className="text-emerald-500" />
-            <span className="text-sm font-medium">导出账单</span>
+            <span className="text-sm font-medium dark:text-gray-200">导出账单</span>
           </motion.button>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleExportAccounts}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Download size={24} className="text-blue-500" />
-            <span className="text-sm font-medium">导出资产</span>
+            <span className="text-sm font-medium dark:text-gray-200">导出资产</span>
           </motion.button>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleBackup}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Icons.Save size={24} className="text-indigo-500" />
-            <span className="text-sm font-medium">备份数据</span>
+            <span className="text-sm font-medium dark:text-gray-200">备份数据</span>
           </motion.button>
           <div className="relative">
             <input 
@@ -674,17 +674,17 @@ export default function Accounts() {
             <motion.div 
               whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white dark:bg-gray-800 h-full p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+              className="bg-white dark:bg-gray-800 h-full p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
             >
               <Icons.Upload size={24} className="text-orange-500" />
-              <span className="text-sm font-medium">恢复数据</span>
+              <span className="text-sm font-medium dark:text-gray-200">恢复数据</span>
             </motion.div>
           </div>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleClearAll}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-red-100 flex flex-col items-center justify-center space-y-2 transition-all text-red-600 hover:bg-red-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-red-100 dark:border-red-900/30 flex flex-col items-center justify-center space-y-2 transition-all text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
           >
             <Icons.Trash2 size={24} className="text-red-500" />
             <span className="text-sm font-medium">清空数据</span>
@@ -693,7 +693,7 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsGuideOpen(true)}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
           >
             <Icons.BookOpen size={24} className="text-emerald-500" />
             <span className="text-sm font-medium">使用说明</span>
@@ -702,16 +702,16 @@ export default function Accounts() {
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsSettingsOpen(true)}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-250"
           >
             <Icons.Settings size={24} className="text-slate-500" />
-            <span className="text-sm font-medium">同步设置</span>
+            <span className="text-sm font-medium dark:text-gray-200">同步设置</span>
           </motion.button>
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsDonationOpen(true)}
-            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center space-y-2 transition-all text-pink-600 hover:bg-pink-50"
+            className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-pink-100 dark:border-pink-900/30 flex flex-col items-center justify-center space-y-2 transition-all text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950/20"
           >
             <Icons.Heart size={24} className="text-pink-500" />
             <span className="text-sm font-medium">赞赏支持</span>
@@ -726,7 +726,7 @@ export default function Accounts() {
                   useStore.getState().setIsGuestMode(true);
                 });
               }}
-              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-50"
+              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750/30"
             >
               <Icons.LogOut size={24} className="text-gray-500" />
               <span className="text-sm font-medium">退出登录</span>
@@ -738,7 +738,7 @@ export default function Accounts() {
               onClick={() => {
                 import('../firebase').then(({ loginWithGoogle }) => loginWithGoogle());
               }}
-              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50"
+              className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col items-center justify-center space-y-2 transition-all text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
             >
               <Icons.LogIn size={24} className="text-emerald-500" />
               <span className="text-sm font-medium">登录同步</span>

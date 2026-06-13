@@ -449,7 +449,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           <button
             type="button"
             onClick={() => setIsTemplateEditorOpen(true)}
-            className="snap-start shrink-0 px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-full transition-colors flex items-center space-x-0.5 shadow-sm"
+            className="snap-start shrink-0 px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/30 dark:text-emerald-400 text-xs font-bold rounded-full transition-colors flex items-center space-x-0.5 shadow-sm"
           >
             <Icons.Plus size={10} />
             <span>新增</span>
@@ -457,7 +457,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           <button
             type="button"
             onClick={() => setIsManageTemplatesOpen(true)}
-            className="snap-start shrink-0 p-1.5 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 text-gray-500 dark:text-gray-400 dark:text-gray-500 rounded-full transition-colors shadow-sm"
+            className="snap-start shrink-0 p-1.5 bg-gray-100 dark:bg-gray-700/50 hover:bg-200 text-gray-500 dark:text-gray-400 rounded-full transition-colors shadow-sm"
             title="管理快捷模板"
           >
             <Icons.Settings size={10} />
@@ -472,15 +472,15 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
             onClick={() => setShowNumpad(true)}
           >
             <span className="text-3xl font-bold text-gray-900 dark:text-gray-100 mr-2">¥</span>
-            <div className={`w-full text-4xl font-bold ${amount ? 'text-gray-900' : 'text-gray-300'}`}>
+            <div className={`w-full text-4xl font-bold ${amount ? 'text-gray-900 dark:text-gray-100' : 'text-gray-300 dark:text-gray-600'}`}>
               {amount || '0.00'}
             </div>
           </div>
 
           {/* AI Helper Card */}
-          <div id="ai-bookkeeper-section" className="bg-gradient-to-br from-violet-50 to-indigo-50 p-4 rounded-2xl border border-indigo-100 space-y-3">
+          <div id="ai-bookkeeper-section" className="bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/30 space-y-3">
             <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2 text-indigo-900">
+              <div className="flex items-center space-x-2 text-indigo-900 dark:text-indigo-200">
                 <Icons.Sparkles size={16} className="text-violet-600 animate-pulse" />
                 <span className="text-xs font-bold">AI 智能辅助记账 (一句话/小票截图)</span>
               </div>
@@ -496,13 +496,13 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 onChange={e => setAiInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAiTextParse()}
                 placeholder="在此输入一句话，如：刚才微信买奶茶花了15"
-                className="flex-1 px-3 py-2 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none animate-pulse-slow"
+                className="flex-1 px-3 py-2 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none animate-pulse-slow text-gray-900 dark:text-gray-100"
               />
               <button
                 type="button"
                 onClick={handleAiTextParse}
                 disabled={aiLoading || !aiInput.trim()}
-                className="px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-xl transition-colors shrink-0 disabled:bg-gray-200 disabled:text-gray-400"
+                className="px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-xl transition-colors shrink-0 disabled:bg-gray-200 disabled:text-gray-400 dark:disabled:bg-gray-850 dark:disabled:text-gray-600"
               >
                 解析
               </button>
@@ -516,7 +516,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     type="button"
                     onClick={takePhotoNative}
                     disabled={aiLoading}
-                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors flex items-center space-x-1 shadow-sm"
                   >
                     <Icons.Camera size={14} />
                     <span>拍照</span>
@@ -525,7 +525,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     type="button"
                     onClick={choosePhotoNative}
                     disabled={aiLoading}
-                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors flex items-center space-x-1 shadow-sm"
                   >
                     <Icons.Image size={14} />
                     <span>上传图片</span>
@@ -545,7 +545,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     />
                     <button
                       type="button"
-                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Icons.Camera size={14} />
                       <span>拍照</span>
@@ -562,7 +562,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                     />
                     <button
                       type="button"
-                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Icons.Image size={14} />
                       <span>上传图片</span>
@@ -575,7 +575,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
 
           {/* Image Preview / Attachment */}
           {image && (
-            <div className="relative bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-indigo-100/50 rounded-2xl p-3 flex flex-col items-center justify-center space-y-2">
+            <div className="relative bg-gray-50 dark:bg-gray-900 border border-indigo-100/50 dark:border-indigo-950/30 rounded-2xl p-3 flex flex-col items-center justify-center space-y-2">
               <img src={image} alt="单据凭证" className="max-h-40 max-w-full rounded-lg object-contain" />
               <div className="flex space-x-2 w-full">
                 <button

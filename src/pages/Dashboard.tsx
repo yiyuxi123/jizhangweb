@@ -239,7 +239,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       <header className="flex justify-between items-center pt-4">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-gray-900">记账本</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">记账本</h1>
             {renderSyncStatus()}
           </div>
           <p className="text-sm text-gray-500">{format(now, 'yyyy年MM月')}</p>
@@ -268,22 +268,22 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
           className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
-          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
+          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 mb-2">
             <TrendingDown size={16} className="text-red-500" />
             <span className="text-sm font-medium">本月支出</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">¥{expense.toFixed(2)}</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">日均 ¥{dailyAverage.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">¥{expense.toFixed(2)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-400 mt-1">日均 ¥{dailyAverage.toFixed(2)}</p>
         </motion.div>
         <motion.div 
           whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
           className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
         >
-          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
+          <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 mb-2">
             <TrendingUp size={16} className="text-emerald-500" />
             <span className="text-sm font-medium">本月收入</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">¥{income.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">¥{income.toFixed(2)}</p>
         </motion.div>
       </div>
 
@@ -292,13 +292,13 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center justify-between"
+          className="bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 p-4 rounded-2xl flex items-center justify-between"
         >
-          <div className="flex items-center space-x-2 text-amber-700">
+          <div className="flex items-center space-x-2 text-amber-700 dark:text-amber-300">
             <Icons.Receipt size={18} />
             <span className="text-sm font-medium">待报销金额</span>
           </div>
-          <p className="text-lg font-bold text-amber-700">¥{reimbursableAmount.toFixed(2)}</p>
+          <p className="text-lg font-bold text-amber-700 dark:text-amber-300">¥{reimbursableAmount.toFixed(2)}</p>
         </motion.div>
       )}
 
@@ -330,10 +330,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       >
         <div className="flex justify-between items-end mb-2">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium mb-1">剩余总预算</p>
-            <p className="text-3xl font-bold text-gray-900">¥{budgetRemaining.toFixed(2)}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">剩余总预算</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">¥{budgetRemaining.toFixed(2)}</p>
           </div>
-          <p className="text-sm text-gray-400">总预算 ¥{totalBudget}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">总预算 ¥{totalBudget}</p>
         </div>
         <div className="h-2 w-full bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden mt-4">
           <motion.div 
@@ -352,9 +352,9 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                 <div className="flex justify-between items-center mb-1">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cb.color }} />
-                    <span className="text-xs font-medium text-gray-700">{cb.categoryName}</span>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{cb.categoryName}</span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     ¥{cb.expense.toFixed(0)} / ¥{cb.amount.toFixed(0)}
                   </span>
                 </div>
@@ -381,7 +381,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
         >
           <div className="flex items-center space-x-2 mb-4">
             <PieChartIcon size={18} className="text-indigo-500" />
-            <h2 className="text-lg font-bold text-gray-900">支出分布</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">支出分布</h2>
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -411,10 +411,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
               <div key={index} className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-gray-600">{item.name}</span>
+                  <span className="text-gray-600 dark:text-gray-300">{item.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-medium text-gray-900">¥{item.amount.toFixed(2)}</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">¥{item.amount.toFixed(2)}</span>
                   <span className="text-gray-400 dark:text-gray-500 text-xs w-8 text-right">
                     {((item.amount / expense) * 100).toFixed(0)}%
                   </span>
@@ -433,7 +433,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
         >
           <div className="flex items-center space-x-2 mb-4">
             <BarChart3 size={18} className="text-blue-500" />
-            <h2 className="text-lg font-bold text-gray-900">收支趋势</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">收支趋势</h2>
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -458,7 +458,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
       {/* Recent Transactions */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-gray-900">最近记录</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">最近记录</h2>
           <button 
             onClick={() => onNavigate('transactions')}
             className="text-sm text-emerald-600 font-medium flex items-center"
@@ -471,7 +471,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
           {recentTransactions.length === 0 ? (
             <div className="p-8 text-center text-gray-400">暂无记录，快去记一笔吧！</div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-gray-50 dark:divide-gray-700/50">
               {recentTransactions.map(t => {
                 const category = categories.find(c => c.id === t.categoryId);
                 const IconComponent = category ? (Icons as any)[category.icon] : Icons.HelpCircle;
@@ -479,7 +479,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                 return (
                   <div 
                     key={t.id} 
-                    className="p-4 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-900 transition-colors cursor-pointer"
+                    className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/30 dark:bg-gray-900 transition-colors cursor-pointer"
                     onClick={() => setSelectedTx(t)}
                   >
                     <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -499,16 +499,16 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
                           )}
                         </p>
                         <div className="mt-0.5 flex flex-col space-y-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 truncate">{format(new Date(t.date), 'MM-dd HH:mm')}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{format(new Date(t.date), 'MM-dd HH:mm')}</p>
                           {t.note && (
-                            <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
+                            <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 dark:bg-gray-800/80 px-1.5 py-0.5 rounded w-fit max-w-full">
                               {t.note}
                             </p>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className={`font-bold shrink-0 ml-4 ${t.type === 'expense' ? 'text-gray-900' : t.type === 'income' ? 'text-emerald-500' : 'text-blue-500'}`}>
+                    <div className={`font-bold shrink-0 ml-4 ${t.type === 'expense' ? 'text-gray-900 dark:text-gray-100' : t.type === 'income' ? 'text-emerald-500' : 'text-blue-500'}`}>
                       {t.type === 'expense' ? '-' : t.type === 'income' ? '+' : ''}¥{t.amount.toFixed(2)}
                     </div>
                   </div>

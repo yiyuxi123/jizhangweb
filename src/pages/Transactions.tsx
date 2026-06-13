@@ -246,30 +246,30 @@ export default function Transactions() {
         </div>
       )}
       {/* Header */}
-      <header className="sticky top-0 bg-gray-50/80 backdrop-blur-md z-10 pt-4 pb-2">
+      <header className="sticky top-0 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md z-10 pt-4 pb-2">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">账单明细</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">账单明细</h1>
           <div className="flex items-center space-x-3">
             <button 
               onClick={() => {
                 setIsSelectionMode(!isSelectionMode);
                 if (isSelectionMode) setSelectedIds(new Set());
               }}
-              className={`p-1.5 rounded-lg transition-colors ${isSelectionMode ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500 hover:text-gray-700 hover:bg-gray-200'}`}
+              className={`p-1.5 rounded-lg transition-colors ${isSelectionMode ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 hover:text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'}`}
               title={isSelectionMode ? "取消批量操作" : "批量操作"}
             >
               <Icons.CheckSquare size={18} />
             </button>
-            <div className="flex bg-gray-200 p-1 rounded-xl">
+            <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl">
               <button 
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
               >
                 <List size={18} />
               </button>
               <button 
                 onClick={() => setViewMode('calendar')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'calendar' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
               >
                 <CalendarIcon size={18} />
               </button>
@@ -334,8 +334,8 @@ export default function Transactions() {
                 onClick={() => setFilterType(type)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                   filterType === type 
-                    ? 'bg-gray-900 text-white shadow-sm' 
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 shadow-sm' 
+                    : 'bg-white text-gray-600 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                 }`}
               >
                 {type === 'all' ? '全部' : type === 'expense' ? '支出' : type === 'income' ? '收入' : '转账'}
@@ -347,8 +347,8 @@ export default function Transactions() {
               onClick={toggleShowReimbursables}
               className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 showReimbursables 
-                  ? 'bg-emerald-100 text-emerald-700' 
-                  : 'bg-gray-100 text-gray-500'
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' 
+                  : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
               }`}
             >
               {showReimbursables ? <Eye size={14} /> : <EyeOff size={14} />}
@@ -356,7 +356,7 @@ export default function Transactions() {
             </button>
             <button 
               onClick={handleExportFiltered}
-              className="p-1.5 rounded-lg transition-colors bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 hover:bg-gray-50"
+              className="p-1.5 rounded-lg transition-colors bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
               title="导出当前筛选结果"
             >
               <Icons.Download size={16} />
@@ -399,9 +399,9 @@ export default function Transactions() {
                         size={16} 
                         className={`text-gray-400 transition-transform ${collapsedMonths.has(month) ? '-rotate-90' : ''}`} 
                       />
-                      <h3 className="font-bold text-gray-900">{format(parseISO(`${month}-01`), 'yyyy年MM月')}</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100">{format(parseISO(`${month}-01`), 'yyyy年MM月')}</h3>
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 flex space-x-3">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 flex space-x-3">
                       <span>支 ¥{monthExpense.toFixed(2)}</span>
                       <span>收 ¥{monthIncome.toFixed(2)}</span>
                     </div>
@@ -424,10 +424,13 @@ export default function Transactions() {
                           
                           return (
                         <motion.div 
-                          whileHover={{ backgroundColor: '#f9fafb' }}
                           whileTap={isSelectionMode ? undefined : { scale: 0.98 }}
                           key={t.id} 
-                          className={`p-4 flex items-center justify-between cursor-pointer ${isSelectionMode && selectedIds.has(t.id) ? 'bg-emerald-50/50' : ''}`}
+                          className={`p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${
+                            isSelectionMode && selectedIds.has(t.id) 
+                              ? 'bg-emerald-50/50 dark:bg-emerald-950/20' 
+                              : ''
+                          }`}
                           onClick={() => {
                             if (isSelectionMode) {
                               toggleSelection(t.id);
@@ -454,30 +457,30 @@ export default function Transactions() {
                               <p className="font-medium text-gray-900 dark:text-gray-100 flex items-center space-x-2">
                                 <span>{t.type === 'transfer' ? '转账' : category?.name || '未知'}</span>
                                 {t.isReimbursable && (
-                                  <span className={`px-1.5 py-0.5 text-[10px] rounded-sm font-medium shrink-0 ${t.isReimbursed ? 'bg-gray-100 text-gray-500' : 'bg-amber-100 text-amber-700'}`}>
+                                  <span className={`px-1.5 py-0.5 text-[10px] rounded-sm font-medium shrink-0 ${t.isReimbursed ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'}`}>
                                     {t.isReimbursed ? '已报销' : '待报销'}
                                   </span>
                                 )}
                                 {category?.isFixed && t.type === 'expense' && (
-                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-sm font-medium shrink-0">固定</span>
+                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 text-[10px] rounded-sm font-medium shrink-0">固定</span>
                                 )}
                               </p>
                               <div className="mt-0.5 flex flex-col space-y-1">
-                                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 truncate">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                   {format(parseISO(t.date), 'MM-dd HH:mm')}
                                   {t.type === 'transfer' && fromAccount && toAccount && ` | ${fromAccount.name} -> ${toAccount.name}`}
                                   {t.type !== 'transfer' && fromAccount && ` | ${fromAccount.name}`}
                                   {t.type !== 'transfer' && toAccount && ` | ${toAccount.name}`}
                                 </p>
                                 {t.note && (
-                                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 px-1.5 py-0.5 rounded w-fit max-w-full">
+                                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate bg-gray-100/80 dark:bg-gray-800/80 px-1.5 py-0.5 rounded w-fit max-w-full">
                                     {t.note}
                                   </p>
                                 )}
                                 {t.tags && t.tags.length > 0 && (
                                   <div className="flex flex-wrap gap-1 mt-1">
                                     {t.tags.map((tag, i) => (
-                                      <span key={i} className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">
+                                      <span key={i} className="text-[10px] bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 dark:text-indigo-400 px-1.5 py-0.5 rounded">
                                         #{tag}
                                       </span>
                                     ))}
@@ -486,7 +489,7 @@ export default function Transactions() {
                               </div>
                             </div>
                           </div>
-                          <div className={`font-bold shrink-0 ml-4 ${t.type === 'expense' ? 'text-gray-900' : t.type === 'income' ? 'text-emerald-500' : 'text-blue-500'}`}>
+                          <div className={`font-bold shrink-0 ml-4 ${t.type === 'expense' ? 'text-gray-900 dark:text-gray-100' : t.type === 'income' ? 'text-emerald-500' : 'text-blue-500'}`}>
                             {t.type === 'expense' ? '-' : t.type === 'income' ? '+' : ''}¥{t.amount.toFixed(2)}
                           </div>
                         </motion.div>
