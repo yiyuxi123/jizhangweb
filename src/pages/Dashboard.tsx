@@ -8,11 +8,13 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import EditBudgetModal from '../components/EditBudgetModal';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import { Transaction } from '../types';
+import AiChatModal from '../components/AiChatModal';
 
 export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const { transactions, accounts, budgets, categories, showReimbursables, toggleShowReimbursables } = useStore();
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
 
   const now = useMemo(() => new Date(), []);
   const start = useMemo(() => startOfMonth(now), [now]);
@@ -151,22 +153,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
   }, [filteredTransactions, now]);
 
   const recentTransactions = useMemo(() => filteredTransactions.slice(0, 5), [filteredTransactions]);
-  const templates = useStore(state => state.templates) || [];
-
-  const handleQuickAdd = (template: any) => {
-    const { addTransaction } = useStore.getState();
-    addTransaction({
-      type: template.type,
-      amount: template.amount || 0,
-      categoryId: template.categoryId,
-      fromAccountId: template.fromAccountId,
-      toAccountId: template.toAccountId,
-      note: template.note || '',
-      tags: template.tags || [],
-      date: new Date().toISOString()
-    });
-    alert('已快捷记账');
-  };
+  // Removed quick templates from dashboard
 
   return (
     <div className="p-4 space-y-6 max-w-md mx-auto">
@@ -234,42 +221,24 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
         </motion.div>
       )}
 
-      {/* Quick Add Templates */}
-      {templates.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center space-x-2 text-gray-900">
-            <Icons.Zap size={18} className="text-yellow-500" />
-            <h2 className="text-lg font-bold">快捷记账</h2>
+      {/* AI Assistant Banner */}
+      <motion.div 
+        whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.15)' }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => setIsAiChatOpen(true)}
+        className="bg-gradient-to-r from-violet-600 to-indigo-600 p-5 rounded-3xl text-white cursor-pointer shadow-lg shadow-indigo-100/50 flex items-center justify-between"
+      >
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-md">
+            <Icons.Sparkles size={22} className="text-yellow-300 animate-pulse" />
           </div>
-          <div className="flex overflow-x-auto pb-2 -mx-4 px-4 space-x-3 snap-x">
-            {templates.map(template => {
-              const category = categories.find(c => c.id === template.categoryId);
-              const IconComponent = category ? (Icons as any)[category.icon] : Icons.ArrowRightLeft;
-              return (
-                <motion.button
-                  key={template.id}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleQuickAdd(template)}
-                  className="snap-start shrink-0 bg-white border border-gray-100 shadow-sm rounded-xl p-3 flex items-center space-x-3 min-w-[140px] text-left"
-                >
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0"
-                    style={{ backgroundColor: template.type === 'transfer' ? '#6b7280' : category?.color || '#9ca3af' }}
-                  >
-                    {IconComponent && <IconComponent size={20} />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 truncate max-w-[80px]">{template.name}</p>
-                    <p className={`text-xs font-bold ${template.type === 'expense' ? 'text-gray-900' : template.type === 'income' ? 'text-emerald-500' : 'text-blue-500'}`}>
-                      {template.type === 'expense' ? '-' : template.type === 'income' ? '+' : ''}¥{template.amount?.toFixed(2) || '0.00'}
-                    </p>
-                  </div>
-                </motion.button>
-              );
-            })}
+          <div>
+            <h4 className="font-bold text-sm">AI 智能财务分析助手</h4>
+            <p className="text-xs text-indigo-100 mt-0.5">一键提问“分析我的本月收支和超支情况”</p>
           </div>
         </div>
-      )}
+        <Icons.ChevronRight size={20} className="text-indigo-200" />
+      </motion.div>
 
       {/* Budget Progress */}
       <motion.div 
@@ -471,6 +440,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
 
       {isBudgetModalOpen && <EditBudgetModal onClose={() => setIsBudgetModalOpen(false)} />}
       {selectedTx && <TransactionDetailModal transaction={selectedTx} onClose={() => setSelectedTx(null)} />}
+      {isAiChatOpen && <AiChatModal onClose={() => setIsAiChatOpen(false)} />}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import * as Icons from 'lucide-react';
 import { Sparkles, ChevronLeft, ChevronRight, PieChart as PieChartIcon, BarChart2, TrendingUp, Scale, Wallet, Tags } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import AiChatModal from '../components/AiChatModal';
 
 const renderActiveShape = (props: any) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
@@ -40,6 +41,7 @@ export default function Statistics() {
   const [type, setType] = useState<'expense' | 'income'>('expense');
   const [period, setPeriod] = useState<'month' | 'year'>('month');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   
   const [visibleMetrics, setVisibleMetrics] = useState(() => {
     const saved = localStorage.getItem('statistics_visible_metrics');
@@ -244,7 +246,16 @@ export default function Statistics() {
     <div className="p-4 space-y-6 max-w-md mx-auto">
       {/* Header */}
       <header className="pt-4 pb-2">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">统计分析</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">统计分析</h1>
+          <button
+            onClick={() => setIsAiChatOpen(true)}
+            className="px-3.5 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-bold rounded-full transition-colors flex items-center space-x-1 shadow-md"
+          >
+            <Icons.Sparkles size={14} className="text-yellow-300" />
+            <span>AI 分析助手</span>
+          </button>
+        </div>
         
         {/* Period & Type Controls */}
         <div className="space-y-3">
@@ -795,6 +806,7 @@ export default function Statistics() {
           </motion.div>
         )}
       </AnimatePresence>
+      {isAiChatOpen && <AiChatModal onClose={() => setIsAiChatOpen(false)} />}
     </div>
   );
 }
