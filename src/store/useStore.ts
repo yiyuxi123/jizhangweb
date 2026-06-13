@@ -600,41 +600,69 @@ export const useStore = create<AppState>()(
             const userId = auth.currentUser?.uid;
             if (!userId) throw new Error("Not logged in");
             
-            const batch = writeBatch(db);
+            const operations: { ref: any; data: any }[] = [];
             
             state.accounts.forEach(acc => {
-              batch.set(doc(db, `users/${userId}/accounts`, acc.id), { ...acc, userId });
+              operations.push({ ref: doc(db, `users/${userId}/accounts`, acc.id), data: { ...acc, userId } });
             });
             state.categories.forEach(cat => {
-              batch.set(doc(db, `users/${userId}/categories`, cat.id), { ...cat, userId });
+              operations.push({ ref: doc(db, `users/${userId}/categories`, cat.id), data: { ...cat, userId } });
             });
             state.transactions.forEach(tx => {
-              batch.set(doc(db, `users/${userId}/transactions`, tx.id), { ...tx, userId });
+              operations.push({ ref: doc(db, `users/${userId}/transactions`, tx.id), data: { ...tx, userId } });
             });
             state.budgets.forEach(b => {
-              batch.set(doc(db, `users/${userId}/budgets`, b.id), { ...b, userId });
+              operations.push({ ref: doc(db, `users/${userId}/budgets`, b.id), data: { ...b, userId } });
             });
             state.templates.forEach(t => {
-              batch.set(doc(db, `users/${userId}/templates`, t.id), { ...t, userId });
+              operations.push({ ref: doc(db, `users/${userId}/templates`, t.id), data: { ...t, userId } });
             });
             state.goals.forEach(g => {
-              batch.set(doc(db, `users/${userId}/goals`, g.id), { ...g, userId });
+              operations.push({ ref: doc(db, `users/${userId}/goals`, g.id), data: { ...g, userId } });
             });
-            
-            await batch.commit();
+
+            if (operations.length > 0) {
+              const batches = [];
+              let currentBatch = writeBatch(db);
+              let count = 0;
+              
+              for (const op of operations) {
+                const cleanData = { ...op.data };
+                Object.keys(cleanData).forEach(key => {
+                  if (cleanData[key] === undefined) delete cleanData[key];
+                });
+                
+                currentBatch.set(op.ref, cleanData);
+                count++;
+                
+                if (count === 400) {
+                  batches.push(currentBatch);
+                  currentBatch = writeBatch(db);
+                  count = 0;
+                }
+              }
+              
+              if (count > 0) {
+                batches.push(currentBatch);
+              }
+              
+              for (const b of batches) {
+                await b.commit();
+              }
+            }
 
             // Sync API keys
             if (state.deepseekApiKey || state.qwenApiKey) {
               await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
-                deepseekApiKey: state.deepseekApiKey,
-                qwenApiKey: state.qwenApiKey,
+                deepseekApiKey: state.deepseekApiKey || '',
+                qwenApiKey: state.qwenApiKey || '',
                 updatedAt: Date.now()
               }, { merge: true });
             }
 
             set({ syncSettings: { ...state.syncSettings, lastSyncTime: Date.now() } });
           } catch (e) {
-            console.error(e);
+            console.error("Failed to syncToCloudNow:", e);
             throw e;
           }
         },
