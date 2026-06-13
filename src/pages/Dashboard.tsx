@@ -11,7 +11,7 @@ import { Transaction } from '../types';
 import AiChatModal from '../components/AiChatModal';
 
 export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  const { transactions, accounts, budgets, categories, showReimbursables, toggleShowReimbursables } = useStore();
+  const { transactions, accounts, budgets, categories, showReimbursables, toggleShowReimbursables, syncStatus, syncAllData, isGuestMode } = useStore();
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
@@ -153,14 +153,83 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
   }, [filteredTransactions, now]);
 
   const recentTransactions = useMemo(() => filteredTransactions.slice(0, 5), [filteredTransactions]);
-  // Removed quick templates from dashboard
+  
+  const renderSyncStatus = () => {
+    if (isGuestMode) {
+      return (
+        <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0">
+          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+          <span>本地模式</span>
+        </span>
+      );
+    }
+
+    switch (syncStatus) {
+      case 'connecting':
+        return (
+          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-full font-bold border border-gray-200/50 flex items-center space-x-1 shrink-0 animate-pulse">
+            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping" />
+            <span>连接中...</span>
+          </span>
+        );
+      case 'syncing':
+        return (
+          <button 
+            type="button"
+            onClick={() => syncAllData()}
+            className="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-[10px] rounded-full font-bold border border-yellow-100 flex items-center space-x-1 shrink-0 shadow-sm"
+          >
+            <Icons.Loader2 size={10} className="animate-spin text-yellow-600" />
+            <span>同步中...</span>
+          </button>
+        );
+      case 'synced':
+        return (
+          <button 
+            type="button"
+            onClick={() => syncAllData()}
+            className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] rounded-full font-bold border border-emerald-100 flex items-center space-x-1 shrink-0 shadow-sm transition-all hover:bg-emerald-100"
+          >
+            <Icons.Check size={10} className="text-emerald-600" />
+            <span>已同步</span>
+          </button>
+        );
+      case 'error':
+        return (
+          <button 
+            type="button"
+            onClick={() => syncAllData()}
+            className="px-2 py-0.5 bg-red-50 text-red-700 text-[10px] rounded-full font-bold border border-red-100 flex items-center space-x-1 shrink-0 shadow-sm hover:bg-red-100"
+            title="点击重试同步"
+          >
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+            <span>未连接</span>
+          </button>
+        );
+      default: // 'idle'
+        return (
+          <button 
+            type="button"
+            onClick={() => syncAllData()}
+            className="px-2 py-0.5 bg-gray-50 text-gray-500 hover:text-gray-700 text-[10px] rounded-full font-medium border border-gray-200/50 flex items-center space-x-1 shrink-0 hover:bg-gray-100 transition-colors"
+            title="点击同步数据"
+          >
+            <Icons.Cloud size={10} className="text-gray-400" />
+            <span>云端就绪</span>
+          </button>
+        );
+    }
+  };
 
   return (
     <div className="p-4 space-y-6 max-w-md mx-auto">
       {/* Header */}
       <header className="flex justify-between items-center pt-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">记账本</h1>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl font-bold text-gray-900">记账本</h1>
+            {renderSyncStatus()}
+          </div>
           <p className="text-sm text-gray-500">{format(now, 'yyyy年MM月')}</p>
         </div>
         <div className="flex items-center space-x-3">

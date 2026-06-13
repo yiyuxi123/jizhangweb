@@ -29,7 +29,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
 
-  const { isGuestMode, setIsGuestMode, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings, syncToCloudNow } = useStore();
+  const { isGuestMode, setIsGuestMode, wasLoggedIn, setWasLoggedIn, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings, syncToCloudNow } = useStore();
 
   const [isCheckingNetwork, setIsCheckingNetwork] = useState(false);
 
@@ -94,6 +94,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       if (currentUser) {
         useStore.getState().setIsGuestMode(false);
+        useStore.getState().setWasLoggedIn(true);
+      } else {
+        useStore.getState().setWasLoggedIn(false);
       }
 
       if (currentUser && syncSettings.storageMode === 'cloud') {
@@ -144,45 +147,26 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (!isAuthReady || !user) return;
     if (syncSettings.storageMode === 'local') return;
-    if (syncSettings.syncFrequency !== 'realtime') return;
 
-    const userId = user.uid;
+    // Trigger bidirectional sync when starting online
+    useStore.getState().syncAllData();
 
-    const unsubAccounts = onSnapshot(collection(db, `users/${userId}/accounts`), (snapshot) => {
-      setAccounts(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    const unsubCategories = onSnapshot(collection(db, `users/${userId}/categories`), (snapshot) => {
-      setCategories(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    const unsubTransactions = onSnapshot(query(collection(db, `users/${userId}/transactions`), orderBy('date', 'desc')), (snapshot) => {
-      setTransactions(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    const unsubBudgets = onSnapshot(collection(db, `users/${userId}/budgets`), (snapshot) => {
-      setBudgets(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    const unsubTemplates = onSnapshot(collection(db, `users/${userId}/templates`), (snapshot) => {
-      setTemplates(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    const unsubGoals = onSnapshot(collection(db, `users/${userId}/goals`), (snapshot) => {
-      setGoals(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)));
-    });
-
-    return () => {
-      unsubAccounts();
-      unsubCategories();
-      unsubTransactions();
-      unsubBudgets();
-      unsubTemplates();
-      unsubGoals();
+    // Listen to network status changes to online
+    const handleOnline = () => {
+      console.log("Device status changed to online. Starting bidirectional sync.");
+      useStore.getState().syncAllData();
     };
-  }, [isAuthReady, user, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings.storageMode, syncSettings.syncFrequency]);
 
-  if (!isAuthReady) {
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [isAuthReady, user, syncSettings.storageMode]);
+
+  const isUserAuthenticated = user || (wasLoggedIn && !isAuthReady);
+  const canBypassSpinner = isGuestMode || wasLoggedIn;
+
+  if (!isAuthReady && !canBypassSpinner) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin text-emerald-500">
@@ -192,7 +176,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
   }
 
-  if (!user && !isGuestMode) {
+  if (!isUserAuthenticated && !isGuestMode) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-inner">

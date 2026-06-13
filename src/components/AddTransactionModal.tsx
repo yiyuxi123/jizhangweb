@@ -9,6 +9,7 @@ import { format, parseISO } from 'date-fns';
 import { Transaction } from '../types';
 import { motion } from 'motion/react';
 import Numpad from './Numpad';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function AddTransactionModal({ isOpen, onClose, initialTransaction }: { isOpen: boolean, onClose: () => void, initialTransaction?: Transaction, key?: string | number }) {
   const { categories, accounts, addTransaction, updateTransaction, transactions, templates } = useStore();
@@ -190,7 +191,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
       toAccountId: type !== 'expense' ? toAccountId : undefined,
       note,
       tags: tags.length > 0 ? tags : undefined,
-      isReimbursable: type === 'expense' && selectedCategory?.name === '交通' ? isReimbursable : undefined,
+      isReimbursable: type === 'expense' ? isReimbursable : undefined,
       reimbursedTxIds: type === 'income' && selectedCategory?.name === '报销款' ? selectedReimbursableIds : undefined,
       image: image || undefined
     };
@@ -202,22 +203,37 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
       
       // Handle transfer fee
       if (type === 'transfer' && fee && !isNaN(Number(fee)) && Number(fee) > 0) {
-        // Find a fee category or use the first expense category
         let feeCategory = categories.find(c => c.type === 'expense' && (c.name.includes('手续费') || c.name.includes('转账')));
-        if (!feeCategory) {
-          feeCategory = categories.find(c => c.type === 'expense');
-        }
         
-        if (feeCategory) {
+        const executeAddFeeTx = (catId: string) => {
           addTransaction({
             type: 'expense',
             amount: Math.round(Number(fee) * 100) / 100,
             date: new Date(date).toISOString(),
-            categoryId: feeCategory.id,
+            categoryId: catId,
             fromAccountId: fromAccountId,
             note: `${note ? note + ' - ' : ''}转账手续费`,
             tags: tags.length > 0 ? tags : undefined,
           });
+        };
+
+        if (!feeCategory) {
+          feeCategory = categories.find(c => c.type === 'expense' && c.name === '手续费');
+        }
+
+        if (feeCategory) {
+          executeAddFeeTx(feeCategory.id);
+        } else {
+          // Auto-bootstrap a "手续费" category
+          const newFeeCatId = uuidv4();
+          useStore.getState().addCategory({
+            id: newFeeCatId,
+            name: '手续费',
+            type: 'expense',
+            icon: 'Percent',
+            color: '#9ca3af',
+          });
+          executeAddFeeTx(newFeeCatId);
         }
       }
     }
@@ -619,7 +635,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           </div>
 
           {/* Reimbursable Checkbox */}
-          {type === 'expense' && selectedCategory?.name === '交通' && (
+          {type === 'expense' && (
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"

@@ -6,5 +6,9 @@
 	"server": {
 		"androidScheme": "https"
 	},
-	"packageClassList": []
+	"packageClassList": [
+		"FilesystemPlugin",
+		"SharePlugin",
+		"GoogleAuth"
+	]
 }

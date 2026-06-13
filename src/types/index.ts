@@ -10,6 +10,7 @@ export interface Category {
   excludeFromBudget?: boolean;
   excludeFromStats?: boolean;
   order?: number;
+  updatedAt?: number; // Last modification timestamp
 }
 
 export interface Account {
@@ -24,6 +25,7 @@ export interface Account {
   autoDepositDay?: number;
   order?: number;
   fundType?: 'working' | 'investment' | 'unavailable';
+  updatedAt?: number; // Last modification timestamp
 }
 
 export interface SyncSettings {
@@ -57,6 +59,7 @@ export interface Transaction {
   reimbursedByTxId?: string;
   history?: TransactionHistory[];
   image?: string; // Base64 data URL of attached receipt image
+  updatedAt?: number; // Last modification timestamp
 }
 
 export interface TransactionTemplate {
@@ -69,6 +72,7 @@ export interface TransactionTemplate {
   toAccountId?: string;
   note?: string;
   tags?: string[];
+  updatedAt?: number; // Last modification timestamp
 }
 
 export interface Budget {
@@ -76,6 +80,7 @@ export interface Budget {
   categoryId?: string; // If undefined, it's a total budget
   amount: number;
   period: 'monthly' | 'yearly';
+  updatedAt?: number; // Last modification timestamp
 }
 
 export interface SavingGoal {
@@ -87,4 +92,5 @@ export interface SavingGoal {
   color: string;
   icon: string;
   accountId?: string;
+  updatedAt?: number; // Last modification timestamp
 }

@@ -40,6 +40,15 @@ interface AppState {
   isGuestMode: boolean;
   setIsGuestMode: (val: boolean) => void;
 
+  wasLoggedIn: boolean;
+  setWasLoggedIn: (val: boolean) => void;
+
+  syncStatus: 'idle' | 'connecting' | 'syncing' | 'synced' | 'error';
+  setSyncStatus: (status: 'idle' | 'connecting' | 'syncing' | 'synced' | 'error') => void;
+
+  tombstones: Record<string, { id: string; entityType: string; deletedAt: number }>;
+  addTombstone: (id: string, entityType: string) => void;
+
   // Actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
@@ -51,7 +60,7 @@ interface AppState {
   reorderAccount: (id: string, direction: 'up' | 'down') => void;
   reorderAccountsList: (accounts: Account[]) => void;
 
-  addCategory: (category: Omit<Category, 'id'>) => void;
+  addCategory: (category: Omit<Category, 'id'> & { id?: string }) => void;
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
   reorderCategory: (id: string, direction: 'up' | 'down') => void;
@@ -80,6 +89,10 @@ interface AppState {
   markPreviousAsReimbursed: () => Promise<void>;
   syncToCloudNow: () => Promise<void>;
   pullFromCloud: () => Promise<void>;
+
+  clearAllData: () => Promise<void>;
+  restoreData: (data: any) => Promise<void>;
+  syncAllData: () => Promise<void>;
 }
 
 export const useStore = create<AppState>()(
@@ -116,6 +129,20 @@ export const useStore = create<AppState>()(
         isGuestMode: false,
         setIsGuestMode: (val) => set({ isGuestMode: val }),
 
+        wasLoggedIn: false,
+        setWasLoggedIn: (val) => set({ wasLoggedIn: val }),
+
+        syncStatus: 'idle',
+        setSyncStatus: (status) => set({ syncStatus: status }),
+
+        tombstones: {},
+        addTombstone: (id, entityType) => set((state) => ({
+          tombstones: {
+            ...state.tombstones,
+            [id]: { id, entityType, deletedAt: Date.now() }
+          }
+        })),
+
         setSyncSettings: (settings) => set((state) => ({ syncSettings: { ...state.syncSettings, ...settings } })),
         toggleShowReimbursables: () => set((state) => ({ showReimbursables: !state.showReimbursables })),
 
@@ -139,7 +166,7 @@ export const useStore = create<AppState>()(
         },
 
         addTransaction: async (transaction) => {
-          const newTx = { ...transaction, id: uuidv4() } as Transaction;
+          const newTx = { ...transaction, id: uuidv4(), updatedAt: Date.now() } as Transaction;
           
           // Local account balance update
           const accounts = [...get().accounts];
@@ -170,7 +197,7 @@ export const useStore = create<AppState>()(
           const oldTx = get().transactions.find((t) => t.id === id);
           if (!oldTx) return;
           
-          const newTx = { ...oldTx, ...updatedFields };
+          const newTx = { ...oldTx, ...updatedFields, updatedAt: Date.now() };
           
           // Revert old transaction from accounts
           const accounts = [...get().accounts];
@@ -214,6 +241,7 @@ export const useStore = create<AppState>()(
         deleteTransaction: async (id) => {
           const tx = get().transactions.find((t) => t.id === id);
           if (!tx) return;
+          get().addTombstone(id, 'transactions');
 
           // Revert transaction from accounts
           const accounts = [...get().accounts];
@@ -241,15 +269,16 @@ export const useStore = create<AppState>()(
         },
 
         addAccount: async (account) => {
-          const newAccount = { ...account, id: uuidv4(), order: get().accounts.length } as Account;
+          const newAccount = { ...account, id: uuidv4(), order: get().accounts.length, updatedAt: Date.now() } as Account;
           set((state) => ({ accounts: [...state.accounts, newAccount] }));
           await syncToCloud(async () => { await firestoreService.addDocument('accounts', newAccount); });
         },
         updateAccount: async (id, account) => {
-          set((state) => ({ accounts: state.accounts.map(a => a.id === id ? { ...a, ...account } : a) }));
-          await syncToCloud(async () => { await firestoreService.updateDocument('accounts', id, account); });
+          set((state) => ({ accounts: state.accounts.map(a => a.id === id ? { ...a, ...account, updatedAt: Date.now() } : a) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('accounts', id, { ...account, updatedAt: Date.now() }); });
         },
         deleteAccount: async (id) => {
+          get().addTombstone(id, 'accounts');
           set((state) => ({ accounts: state.accounts.filter(a => a.id !== id) }));
           await syncToCloud(async () => { await firestoreService.deleteDocument('accounts', id); });
         },
@@ -319,15 +348,17 @@ export const useStore = create<AppState>()(
         },
 
         addCategory: async (category) => {
-          const newCategory = { ...category, id: uuidv4(), order: get().categories.length } as Category;
+          const id = category.id || uuidv4();
+          const newCategory = { ...category, id, order: get().categories.length, updatedAt: Date.now() } as Category;
           set((state) => ({ categories: [...state.categories, newCategory] }));
           await syncToCloud(async () => { await firestoreService.addDocument('categories', newCategory); });
         },
         updateCategory: async (id, category) => {
-          set((state) => ({ categories: state.categories.map(c => c.id === id ? { ...c, ...category } : c) }));
-          await syncToCloud(async () => { await firestoreService.updateDocument('categories', id, category); });
+          set((state) => ({ categories: state.categories.map(c => c.id === id ? { ...c, ...category, updatedAt: Date.now() } : c) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('categories', id, { ...category, updatedAt: Date.now() }); });
         },
         deleteCategory: async (id) => {
+          get().addTombstone(id, 'categories');
           set((state) => ({ categories: state.categories.filter(c => c.id !== id) }));
           await syncToCloud(async () => { await firestoreService.deleteDocument('categories', id); });
         },
@@ -402,43 +433,46 @@ export const useStore = create<AppState>()(
         },
 
         addBudget: async (budget) => {
-          const newBudget = { ...budget, id: uuidv4() } as Budget;
+          const newBudget = { ...budget, id: uuidv4(), updatedAt: Date.now() } as Budget;
           set((state) => ({ budgets: [...state.budgets, newBudget] }));
           await syncToCloud(async () => { await firestoreService.addDocument('budgets', newBudget); });
         },
         updateBudget: async (id, budget) => {
-          set((state) => ({ budgets: state.budgets.map(b => b.id === id ? { ...b, ...budget } : b) }));
-          await syncToCloud(async () => { await firestoreService.updateDocument('budgets', id, budget); });
+          set((state) => ({ budgets: state.budgets.map(b => b.id === id ? { ...b, ...budget, updatedAt: Date.now() } : b) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('budgets', id, { ...budget, updatedAt: Date.now() }); });
         },
         deleteBudget: async (id) => {
+          get().addTombstone(id, 'budgets');
           set((state) => ({ budgets: state.budgets.filter(b => b.id !== id) }));
           await syncToCloud(async () => { await firestoreService.deleteDocument('budgets', id); });
         },
 
         addTemplate: async (template) => {
-          const newTemplate = { ...template, id: uuidv4() } as TransactionTemplate;
+          const newTemplate = { ...template, id: uuidv4(), updatedAt: Date.now() } as TransactionTemplate;
           set((state) => ({ templates: [...state.templates, newTemplate] }));
           await syncToCloud(async () => { await firestoreService.addDocument('templates', newTemplate); });
         },
         updateTemplate: async (id, updatedFields) => {
-          set((state) => ({ templates: state.templates.map(t => t.id === id ? { ...t, ...updatedFields } : t) }));
-          await syncToCloud(async () => { await firestoreService.updateDocument('templates', id, updatedFields); });
+          set((state) => ({ templates: state.templates.map(t => t.id === id ? { ...t, ...updatedFields, updatedAt: Date.now() } : t) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('templates', id, { ...updatedFields, updatedAt: Date.now() }); });
         },
         deleteTemplate: async (id) => {
+          get().addTombstone(id, 'templates');
           set((state) => ({ templates: state.templates.filter(t => t.id !== id) }));
           await syncToCloud(async () => { await firestoreService.deleteDocument('templates', id); });
         },
 
         addGoal: async (goal) => {
-          const newGoal = { ...goal, id: uuidv4() } as SavingGoal;
+          const newGoal = { ...goal, id: uuidv4(), updatedAt: Date.now() } as SavingGoal;
           set((state) => ({ goals: [...state.goals, newGoal] }));
           await syncToCloud(async () => { await firestoreService.addDocument('goals', newGoal); });
         },
         updateGoal: async (id, goal) => {
-          set((state) => ({ goals: state.goals.map(g => g.id === id ? { ...g, ...goal } : g) }));
-          await syncToCloud(async () => { await firestoreService.updateDocument('goals', id, goal); });
+          set((state) => ({ goals: state.goals.map(g => g.id === id ? { ...g, ...goal, updatedAt: Date.now() } : g) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('goals', id, { ...goal, updatedAt: Date.now() }); });
         },
         deleteGoal: async (id) => {
+          get().addTombstone(id, 'goals');
           set((state) => ({ goals: state.goals.filter(g => g.id !== id) }));
           await syncToCloud(async () => { await firestoreService.deleteDocument('goals', id); });
         },
@@ -506,6 +540,179 @@ export const useStore = create<AppState>()(
             console.error("Pull from cloud failed", e);
             throw e;
           }
+        },
+
+        clearAllData: async () => {
+          set({
+            accounts: [],
+            categories: [],
+            transactions: [],
+            budgets: [],
+            templates: [],
+            goals: [],
+            tombstones: {}
+          });
+
+          const userId = auth.currentUser?.uid;
+          if (userId && get().syncSettings.storageMode === 'cloud') {
+            await firestoreService.clearAllData();
+          }
+        },
+
+        restoreData: async (data: any) => {
+          set({
+            accounts: (data.accounts || []).map((a: any) => ({ ...a, balance: Math.round((a.balance || 0) * 100) / 100 })),
+            categories: data.categories || [],
+            transactions: (data.transactions || []).map((t: any) => {
+              const cleanTx = { ...t, amount: Math.round((t.amount || 0) * 100) / 100 };
+              if (cleanTx.history) delete cleanTx.history;
+              if (cleanTx.note && cleanTx.note.length > 500) cleanTx.note = cleanTx.note.substring(0, 500);
+              return cleanTx;
+            }),
+            budgets: data.budgets || [],
+            templates: data.templates || [],
+            goals: data.goals || [],
+            tombstones: data.tombstones || {}
+          });
+
+          const userId = auth.currentUser?.uid;
+          if (userId && get().syncSettings.storageMode === 'cloud') {
+            await firestoreService.restoreData(data);
+          }
+        },
+
+        syncAllData: async () => {
+          const userId = auth.currentUser?.uid;
+          if (!userId) {
+            set({ syncStatus: 'idle' });
+            return;
+          }
+
+          const { syncStatus, syncSettings, tombstones } = get();
+          if (syncStatus === 'syncing') return;
+
+          set({ syncStatus: 'syncing' });
+
+          try {
+            const lastSyncTime = syncSettings.lastSyncTime || 0;
+
+            const syncSingleCollection = async (
+              collectionName: string,
+              localItems: any[],
+              setLocalItems: (items: any[]) => void
+            ) => {
+              const dbCollectionRef = collection(db, `users/${userId}/${collectionName}`);
+              const querySnapshot = await getDocs(dbCollectionRef);
+              
+              const remoteItemsMap = new Map<string, any>();
+              querySnapshot.forEach(doc => {
+                remoteItemsMap.set(doc.id, doc.data());
+              });
+
+              const updatedLocalItems = [...localItems];
+              const itemsToUpload: any[] = [];
+              const itemsToDeleteFromRemote: string[] = [];
+
+              // 1. Process local items
+              for (let i = 0; i < updatedLocalItems.length; i++) {
+                const local = updatedLocalItems[i];
+                const remote = remoteItemsMap.get(local.id);
+
+                if (remote) {
+                  const localTime = local.updatedAt || 0;
+                  const remoteTime = remote.updatedAt || 0;
+
+                  if (localTime > remoteTime) {
+                    itemsToUpload.push(local);
+                  } else if (remoteTime > localTime) {
+                    updatedLocalItems[i] = remote;
+                  }
+                } else {
+                  const tombstone = tombstones[local.id];
+                  if (tombstone) {
+                    itemsToDeleteFromRemote.push(local.id);
+                  } else if (lastSyncTime > 0 && (local.updatedAt || 0) < lastSyncTime) {
+                    updatedLocalItems.splice(i, 1);
+                    i--;
+                  } else {
+                    itemsToUpload.push(local);
+                  }
+                }
+              }
+
+              // 2. Process remote items not present locally
+              const localItemsMap = new Map<string, any>(localItems.map(item => [item.id, item]));
+              for (const [remoteId, remote] of remoteItemsMap.entries()) {
+                if (!localItemsMap.has(remoteId)) {
+                  const tombstone = tombstones[remoteId];
+                  if (tombstone) {
+                    const remoteTime = remote.updatedAt || 0;
+                    if (remoteTime > tombstone.deletedAt) {
+                      updatedLocalItems.push(remote);
+                    } else {
+                      itemsToDeleteFromRemote.push(remoteId);
+                    }
+                  } else {
+                    updatedLocalItems.push(remote);
+                  }
+                }
+              }
+
+              setLocalItems(updatedLocalItems);
+
+              if (itemsToUpload.length > 0 || itemsToDeleteFromRemote.length > 0) {
+                const batch = writeBatch(db);
+                itemsToUpload.forEach(item => {
+                  const ref = doc(db, `users/${userId}/${collectionName}`, item.id);
+                  const cleanItem = { ...item, userId };
+                  Object.keys(cleanItem).forEach(key => {
+                    if ((cleanItem as any)[key] === undefined) delete (cleanItem as any)[key];
+                  });
+                  batch.set(ref, cleanItem);
+                });
+
+                itemsToDeleteFromRemote.forEach(id => {
+                  const ref = doc(db, `users/${userId}/${collectionName}`, id);
+                  batch.delete(ref);
+                });
+
+                await batch.commit();
+              }
+            };
+
+            await syncSingleCollection('accounts', get().accounts, (items) => set({ accounts: items.sort((a, b) => (a.order || 0) - (b.order || 0)) }));
+            await syncSingleCollection('categories', get().categories, (items) => set({ categories: items.sort((a, b) => (a.order || 0) - (b.order || 0)) }));
+            await syncSingleCollection('transactions', get().transactions, (items) => set({ transactions: items }));
+            await syncSingleCollection('budgets', get().budgets, (items) => set({ budgets: items }));
+            await syncSingleCollection('templates', get().templates, (items) => set({ templates: items }));
+            await syncSingleCollection('goals', get().goals, (items) => set({ goals: items }));
+
+            const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+            const activeTombstones = { ...tombstones };
+            let tombstonesChanged = false;
+            Object.entries(activeTombstones).forEach(([id, tomb]) => {
+              if (tomb.deletedAt < thirtyDaysAgo) {
+                delete activeTombstones[id];
+                tombstonesChanged = true;
+              }
+            });
+
+            set({
+              syncStatus: 'synced',
+              syncSettings: { ...get().syncSettings, lastSyncTime: Date.now() },
+              ...(tombstonesChanged ? { tombstones: activeTombstones } : {})
+            });
+
+            setTimeout(() => {
+              if (get().syncStatus === 'synced') {
+                set({ syncStatus: 'idle' });
+              }
+            }, 3000);
+
+          } catch (e) {
+            console.error("Data bidirectional synchronization failed", e);
+            set({ syncStatus: 'error' });
+          }
         }
       };
     },
@@ -522,7 +729,9 @@ export const useStore = create<AppState>()(
         syncSettings: state.syncSettings,
         showReimbursables: state.showReimbursables,
         hasBootstrapped: state.hasBootstrapped,
-        isGuestMode: state.isGuestMode
+        isGuestMode: state.isGuestMode,
+        wasLoggedIn: state.wasLoggedIn,
+        tombstones: state.tombstones
       }),
     }
   )

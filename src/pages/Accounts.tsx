@@ -311,9 +311,21 @@ export default function Accounts() {
   const [showClearConfirm2, setShowClearConfirm2] = useState(false);
 
   const handleBackup = async () => {
+    const includeImages = window.confirm("备份数据时是否包含账单凭证图片？\n\n- 选择【确定】：包含图片（备份文件较大，适合完整迁移）\n- 选择【取消】：不含图片（备份文件极小，适合日常快速备份）");
+    
+    const transactionsToBackup = includeImages 
+      ? transactions 
+      : transactions.map(t => {
+          if (t.image) {
+            const { image, ...rest } = t;
+            return rest;
+          }
+          return t;
+        });
+
     const data = {
       accounts,
-      transactions,
+      transactions: transactionsToBackup,
       categories,
       version: 1,
       timestamp: new Date().toISOString()
@@ -378,8 +390,7 @@ export default function Accounts() {
   const confirmRestore = async () => {
     if (!restoreData) return;
     try {
-      const { firestoreService } = await import('../services/firestoreService');
-      await firestoreService.restoreData(restoreData);
+      await useStore.getState().restoreData(restoreData);
       alert('数据恢复成功！');
     } catch (err: any) {
       console.error('Restore failed:', err);
@@ -401,8 +412,7 @@ export default function Accounts() {
 
   const confirmClearStep2 = async () => {
     try {
-      const { firestoreService } = await import('../services/firestoreService');
-      await firestoreService.clearAllData();
+      await useStore.getState().clearAllData();
       alert('所有数据已清空。');
     } catch (err: any) {
       console.error('Clear failed:', err);
