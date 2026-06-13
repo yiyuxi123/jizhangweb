@@ -431,26 +431,26 @@ export default function Accounts() {
         <h2 className="text-4xl font-bold mb-4">¥{totalBalance.toFixed(2)}</h2>
         
         <div className="grid grid-cols-2 gap-4 py-4 border-t border-emerald-400/30">
-          <div>
+          <div className="text-left">
             <p className="text-emerald-100 text-xs font-medium mb-1">总资产</p>
             <p className="text-lg font-bold">¥{totalAssets.toFixed(2)}</p>
           </div>
-          <div>
+          <div className="text-right">
             <p className="text-emerald-100 text-xs font-medium mb-1">总负债</p>
             <p className="text-lg font-bold">¥{totalLiabilities.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-emerald-400/30 grid grid-cols-3 gap-2 text-center">
-          <div>
+        <div className="pt-4 border-t border-emerald-400/30 grid grid-cols-3 gap-2">
+          <div className="text-left">
             <p className="text-emerald-100 text-[10px] font-medium mb-0.5">流动资金</p>
             <p className="text-sm font-semibold">¥{workingFunds.toFixed(0)}</p>
           </div>
-          <div>
+          <div className="text-center">
             <p className="text-emerald-100 text-[10px] font-medium mb-0.5">投资资金</p>
             <p className="text-sm font-semibold">¥{investmentFunds.toFixed(0)}</p>
           </div>
-          <div>
+          <div className="text-right">
             <p className="text-emerald-100 text-[10px] font-medium mb-0.5">不可用资金</p>
             <p className="text-sm font-semibold">¥{unavailableFunds.toFixed(0)}</p>
           </div>
