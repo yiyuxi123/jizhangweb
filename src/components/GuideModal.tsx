@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, BookOpen, ShieldCheck, Zap, AlertTriangle } from 'lucide-react';
+import { X, BookOpen, ShieldCheck, Zap, AlertTriangle } from '../utils/icons';
 import { motion } from 'motion/react';
 
 export default function GuideModal({ onClose }: { onClose: () => void }) {
@@ -30,8 +30,12 @@ export default function GuideModal({ onClose }: { onClose: () => void }) {
                 <strong className="text-emerald-700 block mb-1 text-base">💼 报销追踪</strong>
                 记账时勾选“可报销”，该笔支出将<span className="font-bold text-emerald-600">不会计入</span>您的个人总支出。当公司打款后，点击添加一笔收入，分类选择为“报销款”，系统会提示您勾选需要被报销的支出账单，即可完成平账。
               </div>
+              <div className="bg-violet-50 p-4 rounded-2xl border border-violet-100/50">
+                <strong className="text-violet-700 block mb-1 text-base">🤖 AI 智能辅助</strong>
+                支持一句话记账与截图小票识别。请在<b>系统设置</b>中配置您个人的 <b>DeepSeek Key</b> (用于解析一句话和理财助手) 和 <b>Qwen Key</b> (用于小票截图识别) 开启 AI 功能。
+              </div>
               <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100/50">
-                <strong className="text-blue-700 block mb-1 text-base">🤖 自动入账</strong>
+                <strong className="text-blue-700 block mb-1 text-base">📅 自动入账</strong>
                 在“资产”页面添加账户时，选择“自动入账”类型，并设置每月入账日和金额。系统会在每个月的这一天自动为您记一笔收入（适合固定工资、房租、公积金等）。
               </div>
             </div>
@@ -54,7 +58,7 @@ export default function GuideModal({ onClose }: { onClose: () => void }) {
               <p className="font-bold mb-2 text-base">⚠️ 数据丢失风险警告</p>
               如果您处于“离线模式”（未登录云同步），您的数据仅存在于当前设备的本地缓存中。
               <br/><br/>
-              <strong>在卸载应用、清除浏览器缓存、或更换手机前</strong>，请务必在“资产”页面点击“备份数据”将数据导出为文件，否则您的账单将永久丢失！
+              <strong>在卸载应用、清除浏览器缓存、或更换手机前</strong>，请务必在“资产”页面点击“备份数据”将数据导出为文件（已支持完整备份您的资产账户、分类、交易流水、预算设置、快捷模板与存钱目标），否则您的数据将永久丢失！
             </div>
           </section>
         </div>

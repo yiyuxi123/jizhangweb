@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Plus, Settings } from 'lucide-react';
+import { X, Plus, Settings } from '../utils/icons';
 import { useStore } from '../store/useStore';
-import * as Icons from 'lucide-react';
+import { Icons } from '../utils/icons';
 import EditCategoryModal from './EditCategoryModal';
 import { Category } from '../types';
 import {

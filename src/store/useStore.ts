@@ -49,6 +49,12 @@ interface AppState {
   tombstones: Record<string, { id: string; entityType: string; deletedAt: number }>;
   addTombstone: (id: string, entityType: string) => void;
 
+  deepseekApiKey: string;
+  qwenApiKey: string;
+  setDeepseekApiKey: (key: string) => void;
+  setQwenApiKey: (key: string) => void;
+  recalculateBalances: (skipUpload?: boolean) => void;
+
   // Actions
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
@@ -143,6 +149,68 @@ export const useStore = create<AppState>()(
           }
         })),
 
+        deepseekApiKey: '',
+        qwenApiKey: '',
+        setDeepseekApiKey: (key) => set({ deepseekApiKey: key }),
+        setQwenApiKey: (key) => set({ qwenApiKey: key }),
+
+        recalculateBalances: (skipUpload = false) => {
+          const { accounts, transactions } = get();
+          let changed = false;
+          
+          const updatedAccounts = accounts.map(account => {
+            const accountTxs = transactions.filter(t => 
+              t.fromAccountId === account.id || t.toAccountId === account.id
+            );
+            
+            const netEffect = accountTxs.reduce((sum, t) => {
+              if (t.type === 'expense' && t.fromAccountId === account.id) {
+                return sum - t.amount;
+              }
+              if (t.type === 'income' && t.toAccountId === account.id) {
+                return sum + t.amount;
+              }
+              if (t.type === 'transfer') {
+                if (t.fromAccountId === account.id) return sum - t.amount;
+                if (t.toAccountId === account.id) return sum + t.amount;
+              }
+              return sum;
+            }, 0);
+            
+            let initialBalance = account.initialBalance;
+            if (initialBalance === undefined) {
+              initialBalance = Math.round((account.balance - netEffect) * 100) / 100;
+            }
+            
+            const expectedBalance = Math.round((initialBalance + netEffect) * 100) / 100;
+            if (account.balance !== expectedBalance || account.initialBalance === undefined) {
+              changed = true;
+              return {
+                ...account,
+                initialBalance,
+                balance: expectedBalance,
+                updatedAt: Date.now()
+              };
+            }
+            return account;
+          });
+          
+          if (changed) {
+            set({ accounts: updatedAccounts });
+            if (!skipUpload) {
+              const { syncSettings } = get();
+              if (syncSettings.storageMode === 'cloud' && syncSettings.syncFrequency === 'realtime') {
+                const userId = auth.currentUser?.uid;
+                if (userId) {
+                  updatedAccounts.forEach(async (acc) => {
+                    await firestoreService.updateDocument('accounts', acc.id, acc);
+                  });
+                }
+              }
+            }
+          }
+        },
+
         setSyncSettings: (settings) => set((state) => ({ syncSettings: { ...state.syncSettings, ...settings } })),
         toggleShowReimbursables: () => set((state) => ({ showReimbursables: !state.showReimbursables })),
 
@@ -175,7 +243,7 @@ export const useStore = create<AppState>()(
           const newTx = { ...transaction, id: uuidv4(), updatedAt: Date.now() } as Transaction;
           
           // Local account balance update
-          const accounts = [...get().accounts];
+          const accounts = get().accounts.map(a => ({ ...a }));
           if (newTx.type === 'expense' && newTx.fromAccountId) {
             const acc = accounts.find(a => a.id === newTx.fromAccountId);
             if (acc) acc.balance -= newTx.amount;
@@ -210,7 +278,7 @@ export const useStore = create<AppState>()(
           const newTx = { ...oldTx, ...updatedFields, updatedAt: Date.now() };
           
           // Revert old transaction from accounts
-          const accounts = [...get().accounts];
+          const accounts = get().accounts.map(a => ({ ...a }));
           if (oldTx.type === 'expense' && oldTx.fromAccountId) {
             const acc = accounts.find(a => a.id === oldTx.fromAccountId);
             if (acc) acc.balance += oldTx.amount;
@@ -258,7 +326,7 @@ export const useStore = create<AppState>()(
           get().addTombstone(id, 'transactions');
 
           // Revert transaction from accounts
-          const accounts = [...get().accounts];
+          const accounts = get().accounts.map(a => ({ ...a }));
           if (tx.type === 'expense' && tx.fromAccountId) {
             const acc = accounts.find(a => a.id === tx.fromAccountId);
             if (acc) acc.balance += tx.amount;
@@ -610,9 +678,19 @@ export const useStore = create<AppState>()(
             tombstones: data.tombstones || {}
           });
 
+          // Perform balance recalculation locally
+          get().recalculateBalances(true);
+
           const userId = auth.currentUser?.uid;
           if (userId && get().syncSettings.storageMode === 'cloud') {
-            await firestoreService.restoreData(data);
+            await firestoreService.restoreData({
+              accounts: get().accounts,
+              categories: get().categories,
+              transactions: get().transactions,
+              budgets: get().budgets,
+              templates: get().templates,
+              goals: get().goals
+            });
           }
         },
 
@@ -1001,6 +1079,9 @@ export const useStore = create<AppState>()(
               goals: mergedGoals
             });
 
+            // Perform balance check and correction locally before uploading
+            get().recalculateBalances(true);
+
             // 3. Firestore Write Phase (compares final state with original remote state and writes changes)
             const uploadAndDeleteSingleCollection = async (
               collectionName: string,
@@ -1039,22 +1120,43 @@ export const useStore = create<AppState>()(
               }
 
               if (itemsToUpload.length > 0 || itemsToDeleteFromRemote.length > 0) {
-                const batch = writeBatch(db);
+                const batches = [];
+                let currentBatch = writeBatch(db);
+                let count = 0;
+
                 itemsToUpload.forEach(item => {
                   const ref = doc(db, `users/${userId}/${collectionName}`, item.id);
                   const cleanItem = { ...item, userId };
                   Object.keys(cleanItem).forEach(key => {
                     if ((cleanItem as any)[key] === undefined) delete (cleanItem as any)[key];
                   });
-                  batch.set(ref, cleanItem);
+                  currentBatch.set(ref, cleanItem);
+                  count++;
+                  if (count === 400) {
+                    batches.push(currentBatch);
+                    currentBatch = writeBatch(db);
+                    count = 0;
+                  }
                 });
 
                 itemsToDeleteFromRemote.forEach(id => {
                   const ref = doc(db, `users/${userId}/${collectionName}`, id);
-                  batch.delete(ref);
+                  currentBatch.delete(ref);
+                  count++;
+                  if (count === 400) {
+                    batches.push(currentBatch);
+                    currentBatch = writeBatch(db);
+                    count = 0;
+                  }
                 });
 
-                await batch.commit();
+                if (count > 0) {
+                  batches.push(currentBatch);
+                }
+
+                for (const batch of batches) {
+                  await batch.commit();
+                }
               }
             };
 

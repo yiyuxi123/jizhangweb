@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { SavingGoal } from '../types';
-import * as Icons from 'lucide-react';
+import { Icons } from '../utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
 import Numpad from './Numpad';
 

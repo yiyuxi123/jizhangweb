@@ -1,7 +1,21 @@
 import { Account, Category, Transaction, Budget } from '../types';
+import { useStore } from '../store/useStore';
 
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-0dd2b3a7f26949c4ad99c2a91cddaf66';
-const QWEN_API_KEY = import.meta.env.VITE_QWEN_API_KEY || 'sk-a6ef332249f74af093528f81f1362f71';
+function getDeepSeekKey(): string {
+  const storeKey = useStore.getState().deepseekApiKey;
+  if (storeKey && storeKey.trim()) return storeKey.trim();
+  const envKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
+  if (envKey && envKey.trim()) return envKey.trim();
+  throw new Error('MISSING_API_KEY_DEEPSEEK');
+}
+
+function getQwenKey(): string {
+  const storeKey = useStore.getState().qwenApiKey;
+  if (storeKey && storeKey.trim()) return storeKey.trim();
+  const envKey = import.meta.env.VITE_QWEN_API_KEY;
+  if (envKey && envKey.trim()) return envKey.trim();
+  throw new Error('MISSING_API_KEY_QWEN');
+}
 
 const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1';
 const QWEN_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
@@ -66,7 +80,7 @@ JSON 格式：
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        'Authorization': `Bearer ${getDeepSeekKey()}`
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
@@ -144,7 +158,7 @@ JSON 格式：
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${QWEN_API_KEY}`
+        'Authorization': `Bearer ${getQwenKey()}`
       },
       body: JSON.stringify({
         model: 'qwen-vl-max',
@@ -252,7 +266,7 @@ ${transactions.slice(0, 10).map(t => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        'Authorization': `Bearer ${getDeepSeekKey()}`
       },
       body: JSON.stringify({
         model: 'deepseek-chat',

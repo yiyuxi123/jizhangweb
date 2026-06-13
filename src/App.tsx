@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, User, PlusCircle } from 'lucide-react';
+import { Home, List, PieChart, User, PlusCircle } from './utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -165,11 +165,15 @@ function AppContent() {
   );
 }
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 export default function App() {
   return (
-    <FirebaseProvider>
-      <AppContent />
-    </FirebaseProvider>
+    <ErrorBoundary>
+      <FirebaseProvider>
+        <AppContent />
+      </FirebaseProvider>
+    </ErrorBoundary>
   );
 }
 

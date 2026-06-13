@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { X, Trash2, Calendar, Tag, CreditCard, AlignLeft, ArrowRight, Edit2, History, Copy } from 'lucide-react';
+import { X, Trash2, Calendar, Tag, CreditCard, AlignLeft, ArrowRight, Edit2, History, Copy, Icons } from '../utils/icons';
 import { useStore } from '../store/useStore';
 import { Transaction } from '../types';
 import { format, parseISO } from 'date-fns';
-import * as Icons from 'lucide-react';
 import AddTransactionModal from './AddTransactionModal';
 
 export default function TransactionDetailModal({ transaction, onClose }: { transaction: Transaction | null, onClose: () => void }) {

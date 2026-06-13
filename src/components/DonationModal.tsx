@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Heart, Coffee } from 'lucide-react';
+import { X, Heart, Coffee } from '../utils/icons';
 import { motion } from 'motion/react';
 
 export default function DonationModal({ onClose }: { onClose: () => void }) {

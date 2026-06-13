@@ -3,8 +3,7 @@ import { parseOneSentence, parseReceiptImage } from '../services/aiService';
 import TemplateModal from './TemplateModal';
 import ManageTemplatesModal from './ManageTemplatesModal';
 import { useStore } from '../store/useStore';
-import { X, Check, Mic } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { Icons } from '../utils/icons';
 import { format, parseISO } from 'date-fns';
 import { Transaction } from '../types';
 import { motion } from 'motion/react';
@@ -71,7 +70,11 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
       applyAiResult(result);
       setAiInput('');
     } catch (err: any) {
-      alert(`AI 一句话解析失败: ${err.message || err}`);
+      if (err.message === 'MISSING_API_KEY_DEEPSEEK') {
+        alert('未配置 DeepSeek API Key。请在「设置」->「AI 智能助理密钥设置」中配置您的 API Key。');
+      } else {
+        alert(`AI 一句话解析失败: ${err.message || err}`);
+      }
     } finally {
       setAiLoading(false);
     }
@@ -97,7 +100,11 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
       const result = await parseReceiptImage(image, accounts, categories);
       applyAiResult(result);
     } catch (err: any) {
-      alert(`图片识别失败: ${err.message || err}`);
+      if (err.message === 'MISSING_API_KEY_QWEN') {
+        alert('未配置 Qwen API Key。请在「设置」->「AI 智能助理密钥设置」中配置您的 API Key。');
+      } else {
+        alert(`图片识别失败: ${err.message || err}`);
+      }
     } finally {
       setAiLoading(false);
     }
@@ -326,7 +333,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
-            <X size={24} />
+            <Icons.X size={24} />
           </button>
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl">
             {(['expense', 'income', 'transfer'] as const).map(t => (
@@ -352,7 +359,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
             className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-full animate-bounce"
             title="AI 智能记账"
           >
-            <Mic size={24} />
+            <Icons.Mic size={24} />
           </button>
         </div>
 
@@ -710,7 +717,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
             onClick={handleSubmit}
             className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 transition-colors flex items-center justify-center space-x-2"
           >
-            <Check size={20} />
+            <Icons.Check size={20} />
             <span>保存记录</span>
           </button>
         </div>

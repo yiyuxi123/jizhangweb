@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { X, Plus, Edit2, Zap } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { X, Plus, Edit2, Zap, Icons } from '../utils/icons';
 import { TransactionTemplate } from '../types';
 import TemplateModal from './TemplateModal';
 import { motion } from 'motion/react';

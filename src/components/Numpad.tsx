@@ -1,5 +1,4 @@
-import React from 'react';
-import * as Icons from 'lucide-react';
+import { Icons } from '../utils/icons';
 
 interface NumpadProps {
   value: string;

@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore';
 import { format, isSameMonth, parseISO } from 'date-fns';
-import * as Icons from 'lucide-react';
-import { Filter, Search, List, Calendar as CalendarIcon, Eye, EyeOff } from 'lucide-react';
+import { Filter, Search, List, Calendar as CalendarIcon, Eye, EyeOff, Icons } from '../utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import TransactionCalendar from '../components/TransactionCalendar';

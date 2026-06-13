@@ -2,8 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, isWithinInterval, parseISO, subMonths, addMonths, subYears, addYears } from 'date-fns';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Sector, AreaChart, Area } from 'recharts';
-import * as Icons from 'lucide-react';
-import { Sparkles, ChevronLeft, ChevronRight, PieChart as PieChartIcon, BarChart2, TrendingUp, Scale, Wallet, Tags } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight, PieChart as PieChartIcon, BarChart2, TrendingUp, Scale, Wallet, Tags, Icons } from '../utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
 import AiChatModal from '../components/AiChatModal';
 

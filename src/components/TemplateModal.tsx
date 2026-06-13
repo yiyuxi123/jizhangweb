@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { X, Check, Trash2 } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { X, Check, Trash2, Icons } from '../utils/icons';
 import { TransactionTemplate, TransactionType } from '../types';
 import { motion } from 'motion/react';
 

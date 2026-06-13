@@ -18,6 +18,7 @@ export interface Account {
   name: string;
   type: 'cash' | 'bank' | 'alipay' | 'wechat' | 'credit' | 'auto_deposit';
   balance: number;
+  initialBalance?: number;
   color: string;
   icon: string;
   isHidden?: boolean;

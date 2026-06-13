@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Sparkles } from 'lucide-react';
+import { Icons } from '../utils/icons';
 import { useStore } from '../store/useStore';
 import { getAiFinancialAdvice } from '../services/aiService';
 import { motion, AnimatePresence } from 'motion/react';
@@ -53,9 +53,12 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
         categories
       );
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'assistant', content: '服务响应超时，请检查您的网络连接后再试。' }]);
+      const errMsg = err.message === 'MISSING_API_KEY_DEEPSEEK'
+        ? '未配置 DeepSeek API Key。请在「设置」->「AI 智能助理密钥设置」中配置您的 API Key。'
+        : '服务响应超时，请检查您的网络连接或稍后再试。';
+      setMessages(prev => [...prev, { role: 'assistant', content: errMsg }]);
     } finally {
       setLoading(false);
     }
@@ -171,7 +174,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
           <div className="flex justify-between items-center p-4 bg-white border-b border-gray-100 shrink-0">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white">
-                <Sparkles size={16} className="text-yellow-300" />
+                <Icons.Sparkles size={16} className="text-yellow-300" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 text-sm">AI 智能财务助手</h3>
@@ -179,7 +182,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
               </div>
             </div>
             <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
-              <X size={20} />
+              <Icons.X size={20} />
             </button>
           </div>
 
@@ -250,7 +253,7 @@ export default function AiChatModal({ onClose }: { onClose: () => void }) {
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Send size={18} />
+              <Icons.Send size={18} />
             </button>
           </div>
         </motion.div>

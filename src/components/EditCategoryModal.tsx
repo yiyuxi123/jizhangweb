@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, Check, Trash2 } from 'lucide-react';
+import { X, Check, Trash2 } from '../utils/icons';
 import { useStore } from '../store/useStore';
 import { Category } from '../types';
-import * as Icons from 'lucide-react';
+import { Icons } from '../utils/icons';
 
 const COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#10b981', 

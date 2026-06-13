@@ -1,10 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
-import { Wallet, TrendingDown, TrendingUp, ChevronRight, Eye, EyeOff, PieChart as PieChartIcon, BarChart3 } from 'lucide-react';
-import * as Icons from 'lucide-react';
 import { motion } from 'motion/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { 
+  Wallet, 
+  TrendingDown, 
+  TrendingUp, 
+  ChevronRight, 
+  Eye, 
+  EyeOff, 
+  PieChart as PieChartIcon, 
+  BarChart3, 
+  Loader2, 
+  Check, 
+  Cloud,
+  Icons
+} from '../utils/icons';
 import EditBudgetModal from '../components/EditBudgetModal';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import { Transaction } from '../types';
@@ -16,9 +28,9 @@ export default function Dashboard({ onNavigate }: { onNavigate: (tab: string) =>
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
 
-  const now = useMemo(() => new Date(), []);
-  const start = useMemo(() => startOfMonth(now), [now]);
-  const end = useMemo(() => endOfMonth(now), [now]);
+  const now = new Date();
+  const start = startOfMonth(now);
+  const end = endOfMonth(now);
 
   const filteredTransactions = useMemo(() => {
     const isReimbursableTx = (t: Transaction) => {

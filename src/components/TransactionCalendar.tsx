@@ -14,8 +14,7 @@ import {
   parseISO,
   isToday
 } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { ChevronLeft, ChevronRight, Icons } from '../utils/icons';
 import TransactionDetailModal from './TransactionDetailModal';
 import { Transaction } from '../types';
 

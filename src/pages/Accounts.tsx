@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore';
-import { Plus, Wallet, CreditCard, Smartphone, MessageCircle, Banknote, Download } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { Plus, Wallet, CreditCard, Smartphone, MessageCircle, Banknote, Download } from '../utils/icons';
+import { Icons } from '../utils/icons';
+import ManageTemplatesModal from '../components/ManageTemplatesModal';
 import { motion } from 'motion/react';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
@@ -173,7 +174,7 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
 }
 
 export default function Accounts() {
-  const { accounts, transactions, categories, reorderAccount, reorderAccountsList } = useStore();
+  const { accounts, transactions, categories, budgets, templates, goals, tombstones, reorderAccount, reorderAccountsList } = useStore();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
@@ -183,6 +184,7 @@ export default function Accounts() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDonationOpen, setIsDonationOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isManageTemplatesOpen, setIsManageTemplatesOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -327,6 +329,10 @@ export default function Accounts() {
       accounts,
       transactions: transactionsToBackup,
       categories,
+      budgets,
+      templates,
+      goals,
+      tombstones,
       version: 1,
       timestamp: new Date().toISOString()
     };
@@ -544,7 +550,7 @@ export default function Accounts() {
           </button>
         </div>
         
-        {useStore(state => state.goals || []).length === 0 ? (
+        {goals.length === 0 ? (
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
             <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <Icons.Target size={24} className="text-emerald-500" />
@@ -553,7 +559,7 @@ export default function Accounts() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3">
-            {useStore(state => state.goals || []).map((goal, index) => {
+            {goals.map((goal, index) => {
               const IconComponent = (Icons as any)[goal.icon] || Icons.Target;
               const linkedAccount = goal.accountId ? accounts.find(a => a.id === goal.accountId) : null;
               const currentAmount = linkedAccount ? linkedAccount.balance : goal.currentAmount;
@@ -624,24 +630,7 @@ export default function Accounts() {
           <motion.button 
             whileHover={{ y: -2, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              const { templates, deleteTemplate } = useStore.getState();
-              if (templates && templates.length > 0) {
-                const templateNames = templates.map((t, i) => `${i + 1}. ${t.name}`).join('\n');
-                const idToDelete = prompt(`当前有以下模板：\n${templateNames}\n\n请输入要删除的模板编号 (1-${templates.length})，或点击取消：`);
-                if (idToDelete) {
-                  const index = parseInt(idToDelete) - 1;
-                  if (index >= 0 && index < templates.length) {
-                    deleteTemplate(templates[index].id);
-                    alert('模板已删除');
-                  } else {
-                    alert('无效的编号');
-                  }
-                }
-              } else {
-                alert('暂无快捷记账模板');
-              }
-            }}
+            onClick={() => setIsManageTemplatesOpen(true)}
             className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2 transition-all text-gray-700"
           >
             <Icons.Zap size={24} className="text-yellow-500" />
@@ -852,6 +841,13 @@ export default function Accounts() {
             </div>
           </motion.div>
         </div>
+      )}
+      {/* Manage Templates Modal */}
+      {isManageTemplatesOpen && (
+        <ManageTemplatesModal
+          isOpen={isManageTemplatesOpen}
+          onClose={() => setIsManageTemplatesOpen(false)}
+        />
       )}
     </div>
   );

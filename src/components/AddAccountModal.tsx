@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { X, Check } from '../utils/icons';
 import { useStore } from '../store/useStore';
 
 export default function AddAccountModal({ onClose }: { onClose: () => void }) {

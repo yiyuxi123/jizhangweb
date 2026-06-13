@@ -3,7 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy, getDocs, writeBatch, doc } from 'firebase/firestore';
 import { auth, db, loginWithGoogle } from '../firebase';
 import { useStore } from '../store/useStore';
-import { Wallet } from 'lucide-react';
+import { Wallet } from '../utils/icons';
 import { v4 as uuidv4 } from 'uuid';
 
 const initialCategories = [
