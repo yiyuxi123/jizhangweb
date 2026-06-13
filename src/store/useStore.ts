@@ -46,6 +46,9 @@ interface AppState {
   syncStatus: 'idle' | 'connecting' | 'syncing' | 'synced' | 'error';
   setSyncStatus: (status: 'idle' | 'connecting' | 'syncing' | 'synced' | 'error') => void;
 
+  syncError: string | null;
+  setSyncError: (error: string | null) => void;
+
   tombstones: Record<string, { id: string; entityType: string; deletedAt: number }>;
   addTombstone: (id: string, entityType: string) => void;
 
@@ -109,8 +112,19 @@ export const useStore = create<AppState>()(
         if (syncSettings.storageMode === 'cloud' && syncSettings.syncFrequency === 'realtime') {
           try {
             await action();
-          } catch (e) {
+          } catch (e: any) {
             console.error("Cloud sync failed", e);
+            const msg = e?.message || String(e);
+            if (msg.includes('exceeds') || msg.includes('size') || msg.includes('1')) {
+              set({ syncError: '数据过大，云端同步失败。请检查是否有过大的图片附件（>1MB），建议压缩后重试。' });
+            } else if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
+              set({ syncError: '云端权限校验失败，安全规则可能需要更新。请在 Firebase 控制台更新 Firestore 规则。' });
+            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout')) {
+              set({ syncError: '网络连接失败，无法访问云端。请检查网络后重试。' });
+            } else {
+              set({ syncError: `云端同步失败: ${msg}` });
+            }
+            set({ syncStatus: 'error' });
           }
         }
       };
@@ -140,6 +154,9 @@ export const useStore = create<AppState>()(
 
         syncStatus: 'idle',
         setSyncStatus: (status) => set({ syncStatus: status }),
+
+        syncError: null,
+        setSyncError: (error) => set({ syncError: error }),
 
         tombstones: {},
         addTombstone: (id, entityType) => set((state) => ({
@@ -661,8 +678,19 @@ export const useStore = create<AppState>()(
             }
 
             set({ syncSettings: { ...state.syncSettings, lastSyncTime: Date.now() } });
-          } catch (e) {
+          } catch (e: any) {
             console.error("Failed to syncToCloudNow:", e);
+            const msg = e?.message || String(e);
+            if (msg.includes('exceeds') || msg.includes('size')) {
+              set({ syncError: '同步失败：部分数据过大（如图片附件 >1MB）。请删除过大附件后重试。' });
+            } else if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
+              set({ syncError: '同步失败：云端权限不足，请检查 Firestore 安全规则是否已更新。' });
+            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout')) {
+              set({ syncError: '同步失败：无法连接云端服务器，请检查网络。' });
+            } else {
+              set({ syncError: `云端同步失败: ${msg}` });
+            }
+            set({ syncStatus: 'error' });
             throw e;
           }
         },

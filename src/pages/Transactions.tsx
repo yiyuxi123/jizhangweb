@@ -11,7 +11,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
 export default function Transactions() {
-  const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables } = useStore();
+  const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables, syncError, setSyncError } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income' | 'transfer'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
@@ -165,6 +165,19 @@ export default function Transactions() {
 
   return (
     <div className="p-4 space-y-6 max-w-md mx-auto">
+      {/* Sync Error Banner */}
+      {syncError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm bg-red-50 border border-red-200 text-red-800 rounded-2xl shadow-lg p-4 animate-in slide-in-from-top-4 duration-300 flex items-start space-x-3">
+          <Icons.AlertCircle size={20} className="shrink-0 mt-0.5 text-red-500" />
+          <p className="text-sm font-medium flex-1 leading-relaxed">{syncError}</p>
+          <button
+            onClick={() => setSyncError(null)}
+            className="shrink-0 p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
+          >
+            <Icons.X size={16} />
+          </button>
+        </div>
+      )}
       {/* Header */}
       <header className="sticky top-0 bg-gray-50/80 backdrop-blur-md z-10 pt-4 pb-2">
         <div className="flex justify-between items-center mb-4">

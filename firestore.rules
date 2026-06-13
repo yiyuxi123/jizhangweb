@@ -125,18 +125,24 @@ service cloud.firestore {
              (!( 'isHidden' in data ) || data.isHidden is bool) &&
              (!( 'autoDepositAmount' in data ) || data.autoDepositAmount is number) &&
              (!( 'autoDepositDay' in data ) || data.autoDepositDay is number) &&
+             (!( 'order' in data ) || data.order is number) &&
+             (!( 'initialBalance' in data ) || data.initialBalance is number) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
+             isValidOptionalString('fundType', 1, 30) &&
              data.userId == request.auth.uid;
     }
 
     function isValidCategory(data) {
       return hasRequiredFields(['name', 'type', 'icon', 'color', 'userId']) &&
              validStringLength('name', 1, 50) &&
-             data.type in ['expense', 'income', 'transfer'] &&
+             data.type in ['expense', 'income'] &&
              validStringLength('icon', 1, 50) &&
              validStringLength('color', 1, 20) &&
              (!( 'isFixed' in data ) || data.isFixed is bool) &&
              (!( 'excludeFromBudget' in data ) || data.excludeFromBudget is bool) &&
              (!( 'excludeFromStats' in data ) || data.excludeFromStats is bool) &&
+             (!( 'order' in data ) || data.order is number) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
              data.userId == request.auth.uid;
     }
 
@@ -155,6 +161,8 @@ service cloud.firestore {
              (!( 'reimbursedTxIds' in data ) || (data.reimbursedTxIds is list && data.reimbursedTxIds.size() <= 100)) &&
              isValidOptionalString('reimbursedByTxId', 1, 100) &&
              (!( 'history' in data ) || (data.history is list && data.history.size() <= 100)) &&
+             (!( 'image' in data ) || (data.image is string && data.image.size() <= 250000)) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
              data.userId == request.auth.uid;
     }
 
@@ -163,6 +171,7 @@ service cloud.firestore {
              data.amount is number &&
              data.period in ['monthly', 'yearly'] &&
              isValidOptionalString('categoryId', 1, 100) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
              data.userId == request.auth.uid;
     }
 
@@ -176,6 +185,7 @@ service cloud.firestore {
              isValidOptionalString('toAccountId', 1, 100) &&
              isValidOptionalString('note', 0, 500) &&
              (!( 'tags' in data ) || (data.tags is list && data.tags.size() <= 20)) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
              data.userId == request.auth.uid;
     }
 
@@ -188,6 +198,7 @@ service cloud.firestore {
              isValidOptionalString('deadline', 1, 50) &&
              validStringLength('icon', 1, 50) &&
              validStringLength('color', 1, 20) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is number) &&
              data.userId == request.auth.uid;
     }
 

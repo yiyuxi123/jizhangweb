@@ -11,6 +11,7 @@ import { Transaction } from '../types';
 import { motion } from 'motion/react';
 import Numpad from './Numpad';
 import { v4 as uuidv4 } from 'uuid';
+import { compressImage } from '../lib/utils';
 
 export default function AddTransactionModal({ isOpen, onClose, initialTransaction }: { isOpen: boolean, onClose: () => void, initialTransaction?: Transaction, key?: string | number }) {
   const { categories, accounts, addTransaction, updateTransaction, transactions, templates } = useStore();
@@ -85,11 +86,16 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const base64Data = event.target?.result as string;
-      setImage(base64Data);
+      try {
+        const compressed = await compressImage(base64Data);
+        setImage(compressed);
+      } catch {
+        setImage(base64Data); // fallback to original if compression fails
+      }
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -104,7 +110,13 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         source: CameraSource.Camera
       });
       if (photo.base64String) {
-        setImage(`data:image/jpeg;base64,${photo.base64String}`);
+        const raw = `data:image/jpeg;base64,${photo.base64String}`;
+        try {
+          const compressed = await compressImage(raw);
+          setImage(compressed);
+        } catch {
+          setImage(raw);
+        }
       }
     } catch (error) {
       console.error('Failed to take photo via Capacitor Camera:', error);
@@ -120,7 +132,13 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         source: CameraSource.Photos
       });
       if (photo.base64String) {
-        setImage(`data:image/jpeg;base64,${photo.base64String}`);
+        const raw = `data:image/jpeg;base64,${photo.base64String}`;
+        try {
+          const compressed = await compressImage(raw);
+          setImage(compressed);
+        } catch {
+          setImage(raw);
+        }
       }
     } catch (error) {
       console.error('Failed to choose photo via Capacitor Gallery:', error);

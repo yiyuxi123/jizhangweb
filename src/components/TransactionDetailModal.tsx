@@ -11,6 +11,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
 
   if (!transaction) return null;
 
@@ -178,14 +179,11 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
                   <span className="text-sm">关联单据/凭证图片</span>
                 </div>
                 <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center overflow-hidden max-h-60">
-                  <img 
-                    src={transaction.image} 
-                    alt="单据凭证" 
+                  <img
+                    src={transaction.image}
+                    alt="单据凭证"
                     className="max-w-full max-h-56 object-contain rounded-lg cursor-zoom-in"
-                    onClick={() => {
-                      const w = window.open();
-                      w?.document.write(`<img src="${transaction.image}" style="max-width:100%; max-height:100%; display:block; margin:auto;" />`);
-                    }}
+                    onClick={() => setImageViewerOpen(true)}
                   />
                 </div>
               </div>
@@ -273,12 +271,12 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
       />
     )}
     {isDuplicateModalOpen && (
-      <AddTransactionModal 
-        isOpen={isDuplicateModalOpen} 
+      <AddTransactionModal
+        isOpen={isDuplicateModalOpen}
         onClose={() => {
           setIsDuplicateModalOpen(false);
           onClose(); // Close detail modal after duplicating
-        }} 
+        }}
         initialTransaction={{
           ...transaction,
           id: '', // Clear ID to create a new one
@@ -286,6 +284,26 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
           history: [] // Clear history
         }}
       />
+    )}
+    {imageViewerOpen && (
+      <div
+        className="fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center"
+        onClick={() => setImageViewerOpen(false)}
+      >
+        {/* Close button */}
+        <button
+          onClick={() => setImageViewerOpen(false)}
+          className="absolute top-4 left-4 z-10 p-2 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-colors"
+        >
+          <Icons.ChevronLeft size={28} />
+        </button>
+        <img
+          src={transaction.image}
+          alt="单据凭证"
+          className="max-w-full max-h-full object-contain p-4"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
     )}
     </>
   );
