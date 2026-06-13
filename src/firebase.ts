@@ -12,11 +12,15 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Initialize Google Auth plugin for Capacitor
 if (Capacitor.isNativePlatform()) {
-  GoogleAuth.initialize({
-    clientId: '1072056160706-1sndoo5uo069kshm9tg1268j8qfo6grt.apps.googleusercontent.com',
-    scopes: ['profile', 'email'],
-    grantOfflineAccess: true,
-  });
+  try {
+    GoogleAuth.initialize({
+      clientId: '1072056160706-1sndoo5uo069kshm9tg1268j8qfo6grt.apps.googleusercontent.com',
+      scopes: ['profile', 'email'],
+      grantOfflineAccess: true,
+    });
+  } catch (error) {
+    console.error("Error initializing GoogleAuth plugin:", error);
+  }
 }
 
 export const loginWithGoogle = async () => {

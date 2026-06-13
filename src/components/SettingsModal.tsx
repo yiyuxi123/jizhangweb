@@ -68,12 +68,28 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
 
   const handleDsKeyChange = (val: string) => {
     setDsKey(val);
-    setDeepseekApiKey(val);
   };
 
   const handleQwKeyChange = (val: string) => {
     setQwKey(val);
-    setQwenApiKey(val);
+  };
+
+  const handleDsBlur = () => {
+    if (dsKey !== deepseekApiKey) {
+      setDeepseekApiKey(dsKey);
+    }
+  };
+
+  const handleQwBlur = () => {
+    if (qwKey !== qwenApiKey) {
+      setQwenApiKey(qwKey);
+    }
+  };
+
+  const handleClose = () => {
+    if (dsKey !== deepseekApiKey) setDeepseekApiKey(dsKey);
+    if (qwKey !== qwenApiKey) setQwenApiKey(qwKey);
+    onClose();
   };
 
   return (
@@ -81,7 +97,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
           <h2 className="text-xl font-bold text-gray-900">同步与 AI 设置</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+          <button onClick={handleClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
             <Icons.X size={24} />
           </button>
         </div>
@@ -210,6 +226,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     type={showDsKey ? 'text' : 'password'}
                     value={dsKey}
                     onChange={e => handleDsKeyChange(e.target.value)}
+                    onBlur={handleDsBlur}
                     placeholder="sk-..."
                     className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
                   />
@@ -234,6 +251,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     type={showQwKey ? 'text' : 'password'}
                     value={qwKey}
                     onChange={e => handleQwKeyChange(e.target.value)}
+                    onBlur={handleQwBlur}
                     placeholder="sk-..."
                     className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
                   />

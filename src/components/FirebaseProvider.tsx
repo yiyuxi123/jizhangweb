@@ -3,7 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy, getDocs, writeBatch, doc } from 'firebase/firestore';
 import { auth, db, loginWithGoogle } from '../firebase';
 import { useStore } from '../store/useStore';
-import { Wallet } from '../utils/icons';
+import { Wallet, Icons } from '../utils/icons';
 import { v4 as uuidv4 } from 'uuid';
 
 const initialCategories = [
@@ -28,6 +28,7 @@ let isInitializing = false;
 export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const { isGuestMode, setIsGuestMode, wasLoggedIn, setWasLoggedIn, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings, syncToCloudNow } = useStore();
 
@@ -50,7 +51,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } catch (error) {
         console.log("Network check failed, auto-enabling offline mode");
         setIsGuestMode(true);
-        alert("检测到无法连接云端数据库（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
+        setAlertMessage("检测到无法连接云端数据库（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
       } finally {
         setIsCheckingNetwork(false);
       }
@@ -81,7 +82,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setIsAuthReady(true);
         useStore.getState().setIsGuestMode(true);
         if (!wasGuest) {
-          alert("连接云端服务超时（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
+          setAlertMessage("连接云端服务超时（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
         }
       }
     }, 3000);
@@ -184,18 +185,17 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const isUserAuthenticated = user || (wasLoggedIn && !isAuthReady);
   const canBypassSpinner = isGuestMode || wasLoggedIn;
 
+  let content;
   if (!isAuthReady && !canBypassSpinner) {
-    return (
+    content = (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin text-emerald-500">
           <Wallet size={48} />
         </div>
       </div>
     );
-  }
-
-  if (!isUserAuthenticated && !isGuestMode) {
-    return (
+  } else if (!isUserAuthenticated && !isGuestMode) {
+    content = (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
           <Wallet size={40} />
@@ -227,7 +227,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">或者</span>
               <div className="flex-grow border-t border-gray-200"></div>
             </div>
-
+ 
             <button
               onClick={() => setIsGuestMode(true)}
               className="w-full px-8 py-4 bg-emerald-50 border border-emerald-100 rounded-xl shadow-sm font-bold text-emerald-600 hover:bg-emerald-100 transition-colors flex items-center justify-center"
@@ -238,7 +238,30 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         )}
       </div>
     );
+  } else {
+    content = <>{children}</>;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {content}
+      {alertMessage && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-500 mb-4 mx-auto animate-bounce">
+              <Icons.AlertCircle size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-center text-gray-900 mb-2">网络及云同步提示</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 leading-relaxed">{alertMessage}</p>
+            <button
+              onClick={() => setAlertMessage(null)}
+              className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold transition-all shadow-md active:scale-95 text-sm"
+            >
+              我知道了
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };

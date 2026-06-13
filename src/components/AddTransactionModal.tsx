@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { parseOneSentence, parseReceiptImage } from '../services/aiService';
 import TemplateModal from './TemplateModal';
 import ManageTemplatesModal from './ManageTemplatesModal';
@@ -91,6 +93,38 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
     };
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const takePhotoNative = async () => {
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Camera
+      });
+      if (photo.base64String) {
+        setImage(`data:image/jpeg;base64,${photo.base64String}`);
+      }
+    } catch (error) {
+      console.error('Failed to take photo via Capacitor Camera:', error);
+    }
+  };
+
+  const choosePhotoNative = async () => {
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Photos
+      });
+      if (photo.base64String) {
+        setImage(`data:image/jpeg;base64,${photo.base64String}`);
+      }
+    } catch (error) {
+      console.error('Failed to choose photo via Capacitor Gallery:', error);
+    }
   };
 
   const handleRunAiOnAttachedImage = async () => {
@@ -458,22 +492,66 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
 
             <div className="flex items-center justify-between pt-1">
               <span className="text-[10px] text-gray-400">自动提取分类、账户及消费详情</span>
-              <div className="relative shrink-0">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={aiLoading}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <button
-                  type="button"
-                  className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
-                >
-                  <Icons.Camera size={14} />
-                  <span>选择图片</span>
-                </button>
-              </div>
+              {Capacitor.isNativePlatform() ? (
+                <div className="flex space-x-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={takePhotoNative}
+                    disabled={aiLoading}
+                    className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                  >
+                    <Icons.Camera size={14} />
+                    <span>拍照</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={choosePhotoNative}
+                    disabled={aiLoading}
+                    className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                  >
+                    <Icons.Image size={14} />
+                    <span>上传图片</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex space-x-2 shrink-0">
+                  {/* Take Photo Option */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleImageUpload}
+                      disabled={aiLoading}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    >
+                      <Icons.Camera size={14} />
+                      <span>拍照</span>
+                    </button>
+                  </div>
+                  {/* Upload Image Option */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={aiLoading}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors flex items-center space-x-1 shadow-sm"
+                    >
+                      <Icons.Image size={14} />
+                      <span>上传图片</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

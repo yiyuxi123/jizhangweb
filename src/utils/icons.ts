@@ -85,7 +85,8 @@ import {
   Filter,
   Search,
   BarChart3,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from 'lucide-react';
 
 export {
@@ -175,7 +176,8 @@ export {
   Filter,
   Search,
   BarChart3,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 };
 
 export const Icons = {
@@ -265,5 +267,6 @@ export const Icons = {
   Filter,
   Search,
   BarChart3,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 };

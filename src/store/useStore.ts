@@ -4,7 +4,7 @@ import { get, set as idbSet, del } from 'idb-keyval';
 import { Account, Budget, Category, Transaction, TransactionTemplate, SavingGoal, SyncSettings } from '../types';
 import { firestoreService } from '../services/firestoreService';
 import { v4 as uuidv4 } from 'uuid';
-import { writeBatch, doc, getDocs, collection } from 'firebase/firestore';
+import { writeBatch, doc, getDocs, collection, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 // Custom storage for IndexedDB
@@ -151,8 +151,42 @@ export const useStore = create<AppState>()(
 
         deepseekApiKey: '',
         qwenApiKey: '',
-        setDeepseekApiKey: (key) => set({ deepseekApiKey: key }),
-        setQwenApiKey: (key) => set({ qwenApiKey: key }),
+        setDeepseekApiKey: async (key) => {
+          set({ deepseekApiKey: key });
+          const { syncSettings } = get();
+          const userId = auth.currentUser?.uid;
+          if (userId && syncSettings.storageMode === 'cloud') {
+            try {
+              await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
+                deepseekApiKey: key,
+                qwenApiKey: get().qwenApiKey,
+                updatedAt: Date.now()
+              }, { merge: true });
+              // Automatically trigger sync
+              await get().syncAllData();
+            } catch (e) {
+              console.error("Failed to sync deepseekApiKey to cloud", e);
+            }
+          }
+        },
+        setQwenApiKey: async (key) => {
+          set({ qwenApiKey: key });
+          const { syncSettings } = get();
+          const userId = auth.currentUser?.uid;
+          if (userId && syncSettings.storageMode === 'cloud') {
+            try {
+              await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
+                deepseekApiKey: get().deepseekApiKey,
+                qwenApiKey: key,
+                updatedAt: Date.now()
+              }, { merge: true });
+              // Automatically trigger sync
+              await get().syncAllData();
+            } catch (e) {
+              console.error("Failed to sync qwenApiKey to cloud", e);
+            }
+          }
+        },
 
         recalculateBalances: (skipUpload = false) => {
           const { accounts, transactions } = get();
@@ -589,6 +623,15 @@ export const useStore = create<AppState>()(
             
             await batch.commit();
 
+            // Sync API keys
+            if (state.deepseekApiKey || state.qwenApiKey) {
+              await setDoc(doc(db, `users/${userId}/config`, 'api_keys'), {
+                deepseekApiKey: state.deepseekApiKey,
+                qwenApiKey: state.qwenApiKey,
+                updatedAt: Date.now()
+              }, { merge: true });
+            }
+
             set({ syncSettings: { ...state.syncSettings, lastSyncTime: Date.now() } });
           } catch (e) {
             console.error(e);
@@ -605,14 +648,19 @@ export const useStore = create<AppState>()(
           set({ syncStatus: 'syncing' });
           
           try {
-            const [accSnap, catSnap, txSnap, budSnap, tplSnap, goalSnap] = await Promise.all([
+            const [accSnap, catSnap, txSnap, budSnap, tplSnap, goalSnap, keysSnap] = await Promise.all([
               getDocs(collection(db, `users/${userId}/accounts`)),
               getDocs(collection(db, `users/${userId}/categories`)),
               getDocs(collection(db, `users/${userId}/transactions`)),
               getDocs(collection(db, `users/${userId}/budgets`)),
               getDocs(collection(db, `users/${userId}/templates`)),
-              getDocs(collection(db, `users/${userId}/goals`))
+              getDocs(collection(db, `users/${userId}/goals`)),
+              getDoc(doc(db, `users/${userId}/config`, 'api_keys')).catch(() => null)
             ]);
+
+            const keysData = keysSnap && keysSnap.exists() ? keysSnap.data() : null;
+            const remoteDSKey = keysData?.deepseekApiKey || '';
+            const remoteQWKey = keysData?.qwenApiKey || '';
             
             set({
               accounts: accSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
@@ -625,6 +673,8 @@ export const useStore = create<AppState>()(
               budgets: budSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
               templates: tplSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
               goals: goalSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)),
+              deepseekApiKey: remoteDSKey || get().deepseekApiKey,
+              qwenApiKey: remoteQWKey || get().qwenApiKey,
               syncSettings: { ...get().syncSettings, lastSyncTime: Date.now() },
               syncStatus: 'synced'
             });
@@ -1165,9 +1215,42 @@ export const useStore = create<AppState>()(
               uploadAndDeleteSingleCollection('categories', get().categories, categoriesResult.remoteItemsMap),
               uploadAndDeleteSingleCollection('transactions', get().transactions, transactionsResult.remoteItemsMap),
               uploadAndDeleteSingleCollection('budgets', get().budgets, budgetsResult.remoteItemsMap),
-              uploadAndDeleteSingleCollection('templates', get().templates, templatesResult.remoteItemsMap),
               uploadAndDeleteSingleCollection('goals', get().goals, goalsResult.remoteItemsMap)
             ]);
+
+            // Sync API Keys
+            try {
+              const keysDocRef = doc(db, `users/${userId}/config`, 'api_keys');
+              const keysSnap = await getDoc(keysDocRef);
+              const { deepseekApiKey, qwenApiKey } = get();
+              if (keysSnap.exists()) {
+                const keysData = keysSnap.data();
+                const remoteDSKey = keysData.deepseekApiKey || '';
+                const remoteQWKey = keysData.qwenApiKey || '';
+                
+                if (!deepseekApiKey && !qwenApiKey) {
+                  set({ deepseekApiKey: remoteDSKey, qwenApiKey: remoteQWKey });
+                } else if (remoteDSKey !== deepseekApiKey || remoteQWKey !== qwenApiKey) {
+                  await setDoc(keysDocRef, {
+                    deepseekApiKey: deepseekApiKey || remoteDSKey,
+                    qwenApiKey: qwenApiKey || remoteQWKey,
+                    updatedAt: Date.now()
+                  }, { merge: true });
+                  set({
+                    deepseekApiKey: deepseekApiKey || remoteDSKey,
+                    qwenApiKey: qwenApiKey || remoteQWKey
+                  });
+                }
+              } else if (deepseekApiKey || qwenApiKey) {
+                await setDoc(keysDocRef, {
+                  deepseekApiKey,
+                  qwenApiKey,
+                  updatedAt: Date.now()
+                });
+              }
+            } catch (e) {
+              console.error("Failed to sync API keys during syncAllData", e);
+            }
 
             // Clean up old tombstones
             const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -1214,7 +1297,9 @@ export const useStore = create<AppState>()(
         hasBootstrapped: state.hasBootstrapped,
         isGuestMode: state.isGuestMode,
         wasLoggedIn: state.wasLoggedIn,
-        tombstones: state.tombstones
+        tombstones: state.tombstones,
+        deepseekApiKey: state.deepseekApiKey,
+        qwenApiKey: state.qwenApiKey
       }),
     }
   )
