@@ -168,6 +168,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // ---- Real-time Firestore listeners + app lifecycle sync ----
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const firstSnapRef = useRef<Set<string>>(new Set()); // track which coll has completed first snapshot
 
   useEffect(() => {
     if (!isAuthReady || !user) return;
@@ -175,6 +176,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const userId = user.uid;
     const unsubscribes: (() => void)[] = [];
+    // Reset first-snapshot markers whenever user/mode changes
+    firstSnapRef.current.clear();
 
     // Set up onSnapshot for each collection — remote changes arrive within seconds
     const collNames = ['accounts', 'categories', 'transactions', 'budgets', 'templates', 'goals'] as const;
@@ -184,6 +187,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Only act on server-committed changes (ignore our own pending writes)
         const remoteChanges = snapshot.docChanges().filter(c => !c.doc.metadata.hasPendingWrites);
         if (remoteChanges.length === 0) return;
+
+        const isFirst = !firstSnapRef.current.has(collName);
+        if (isFirst) firstSnapRef.current.add(collName);
 
         const store = useStore.getState();
         const localMap = new Map<string, any>((store as any)[collName].map((item: any) => [item.id, item]));
@@ -196,9 +202,17 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (change.type === 'removed') {
             if (local) { localMap.delete(change.doc.id); hasChanges = true; }
           } else {
-            const remoteTime = remoteData.updatedAt || 0;
-            const localTime = local?.updatedAt || 0;
-            if (!local || remoteTime > localTime) {
+            // First snapshot: timestamp arbitration to avoid overwriting newer local data
+            // Subsequent snapshots: always accept server data (clock skew would break comparisons)
+            if (isFirst) {
+              const remoteTime = remoteData.updatedAt || 0;
+              const localTime = local?.updatedAt || 0;
+              if (!local || remoteTime > localTime) {
+                localMap.set(change.doc.id, { ...(local || {}), ...remoteData });
+                hasChanges = true;
+              }
+            } else {
+              // Incremental: accept unless local has unsynced pending changes (guarded by hasPendingWrites filter above)
               localMap.set(change.doc.id, { ...(local || {}), ...remoteData });
               hasChanges = true;
             }

@@ -109,7 +109,7 @@ export const useStore = create<AppState>()(
     (set, get) => {
       const syncToCloud = async (action: () => Promise<void>) => {
         const { syncSettings } = get();
-        if (syncSettings.storageMode === 'cloud' && syncSettings.syncFrequency === 'realtime') {
+        if (syncSettings.storageMode === 'cloud') {
           try {
             await action();
           } catch (e: any) {
@@ -264,7 +264,17 @@ export const useStore = create<AppState>()(
           }
         },
 
-        setSyncSettings: (settings) => set((state) => ({ syncSettings: { ...state.syncSettings, ...settings } })),
+        setSyncSettings: (settings) => {
+          const prev = get().syncSettings;
+          const next = { ...prev, ...settings };
+          set({ syncSettings: next });
+          // When switching from local to cloud, trigger immediate full sync
+          if (settings.storageMode === 'cloud' && prev.storageMode === 'local') {
+            setTimeout(() => {
+              get().syncAllData().catch(console.error);
+            }, 500);
+          }
+        },
         toggleShowReimbursables: () => set((state) => ({ showReimbursables: !state.showReimbursables })),
 
         setAccounts: (accounts) => set({ accounts: accounts.sort((a, b) => (a.order || 0) - (b.order || 0)) }),
