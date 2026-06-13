@@ -129,17 +129,38 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 await batch.commit();
                 useStore.getState().setHasBootstrapped(true);
               }
+            } else {
+              // Cloud has data!
+              // If local has no transactions, we clear local defaults and sync from cloud to prevent duplicates
+              const localTransactions = useStore.getState().transactions;
+              if (localTransactions.length === 0) {
+                console.log("Local has no transactions. Clearing defaults and pulling clean cloud data via syncAllData.");
+                useStore.setState({
+                  accounts: [],
+                  categories: [],
+                  budgets: [],
+                  templates: [],
+                  goals: []
+                });
+                await useStore.getState().syncAllData();
+              } else {
+                // If local has transactions, we do a bidirectional sync
+                console.log("Local has transactions. Performing bidirectional sync.");
+                await useStore.getState().syncAllData();
+              }
             }
           } catch (error) {
             console.error("Error during initialization:", error);
           } finally {
-            // Keep it true for a short time to prevent immediate re-runs in strict mode
+            setIsAuthReady(true);
             setTimeout(() => { isInitializing = false; }, 2000);
           }
+        } else {
+          setIsAuthReady(true);
         }
+      } else {
+        setIsAuthReady(true);
       }
-      
-      setIsAuthReady(true);
     });
     return () => unsubscribe();
   }, [syncSettings.storageMode]);
@@ -147,9 +168,6 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (!isAuthReady || !user) return;
     if (syncSettings.storageMode === 'local') return;
-
-    // Trigger bidirectional sync when starting online
-    useStore.getState().syncAllData();
 
     // Listen to network status changes to online
     const handleOnline = () => {
