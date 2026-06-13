@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy, getDocs, writeBatch, doc } from 'firebase/firestore';
 import { auth, db, loginWithGoogle } from '../firebase';
@@ -166,19 +166,89 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => unsubscribe();
   }, [syncSettings.storageMode]);
 
+  // ---- Real-time Firestore listeners + app lifecycle sync ----
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (!isAuthReady || !user) return;
     if (syncSettings.storageMode === 'local') return;
 
-    // Listen to network status changes to online
-    const handleOnline = () => {
-      console.log("Device status changed to online. Starting bidirectional sync.");
-      useStore.getState().syncAllData();
+    const userId = user.uid;
+    const unsubscribes: (() => void)[] = [];
+
+    // Set up onSnapshot for each collection — remote changes arrive within seconds
+    const collNames = ['accounts', 'categories', 'transactions', 'budgets', 'templates', 'goals'] as const;
+    collNames.forEach(collName => {
+      const collRef = collection(db, `users/${userId}/${collName}`);
+      const unsub = onSnapshot(collRef, (snapshot) => {
+        // Only act on server-committed changes (ignore our own pending writes)
+        const remoteChanges = snapshot.docChanges().filter(c => !c.doc.metadata.hasPendingWrites);
+        if (remoteChanges.length === 0) return;
+
+        const store = useStore.getState();
+        const localMap = new Map<string, any>((store as any)[collName].map((item: any) => [item.id, item]));
+        let hasChanges = false;
+
+        remoteChanges.forEach(change => {
+          const remoteData: any = { id: change.doc.id, ...change.doc.data() };
+          const local = localMap.get(change.doc.id);
+
+          if (change.type === 'removed') {
+            if (local) { localMap.delete(change.doc.id); hasChanges = true; }
+          } else {
+            const remoteTime = remoteData.updatedAt || 0;
+            const localTime = local?.updatedAt || 0;
+            if (!local || remoteTime > localTime) {
+              localMap.set(change.doc.id, { ...(local || {}), ...remoteData });
+              hasChanges = true;
+            }
+          }
+        });
+
+        if (hasChanges) {
+          const items = Array.from(localMap.values());
+          const setterMap: Record<string, (items: any[]) => void> = {
+            accounts: store.setAccounts,
+            categories: store.setCategories,
+            transactions: store.setTransactions,
+            budgets: store.setBudgets,
+            templates: store.setTemplates,
+            goals: store.setGoals,
+          };
+          setterMap[collName]?.(items);
+        }
+      }, (err) => {
+        console.error(`onSnapshot error for ${collName}:`, err);
+      });
+      unsubscribes.push(unsub);
+    });
+
+    // ---- App lifecycle: sync when returning to foreground ----
+    const doBackgroundSync = () => {
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      // Debounce: avoid syncing multiple times in quick succession
+      syncTimerRef.current = setTimeout(() => {
+        console.log("App foreground / online — running syncAllData");
+        useStore.getState().syncAllData().catch(console.error);
+      }, 500);
     };
 
-    window.addEventListener('online', handleOnline);
+    // Network recovery
+    window.addEventListener('online', doBackgroundSync);
+
+    // Page visibility (web + Capacitor WebView)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        doBackgroundSync();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
-      window.removeEventListener('online', handleOnline);
+      unsubscribes.forEach(fn => fn());
+      window.removeEventListener('online', doBackgroundSync);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
     };
   }, [isAuthReady, user, syncSettings.storageMode]);
 
