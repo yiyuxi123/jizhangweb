@@ -56,6 +56,7 @@ export interface Transaction {
   reimbursedTxIds?: string[];
   reimbursedByTxId?: string;
   history?: TransactionHistory[];
+  image?: string; // Base64 data URL of attached receipt image
 }
 
 export interface TransactionTemplate {

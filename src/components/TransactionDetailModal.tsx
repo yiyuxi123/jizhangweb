@@ -172,6 +172,26 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
               </div>
             )}
 
+            {transaction.image && (
+              <div className="pt-3 mt-3 border-t border-gray-200/60">
+                <div className="flex items-center space-x-2 text-gray-500 mb-2">
+                  <Icons.Image size={18} />
+                  <span className="text-sm">关联单据/凭证图片</span>
+                </div>
+                <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center overflow-hidden max-h-60">
+                  <img 
+                    src={transaction.image} 
+                    alt="单据凭证" 
+                    className="max-w-full max-h-56 object-contain rounded-lg cursor-zoom-in"
+                    onClick={() => {
+                      const w = window.open();
+                      w?.document.write(`<img src="${transaction.image}" style="max-width:100%; max-height:100%; display:block; margin:auto;" />`);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             {transaction.tags && transaction.tags.length > 0 && (
               <div className="pt-3 mt-3 border-t border-gray-200/60">
                 <div className="flex items-center space-x-2 text-gray-500 mb-2">

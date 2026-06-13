@@ -62,6 +62,7 @@ interface AppState {
   deleteBudget: (id: string) => void;
 
   addTemplate: (template: Omit<TransactionTemplate, 'id'>) => void;
+  updateTemplate: (id: string, template: Partial<TransactionTemplate>) => void;
   deleteTemplate: (id: string) => void;
 
   addGoal: (goal: Omit<SavingGoal, 'id'>) => void;
@@ -418,6 +419,10 @@ export const useStore = create<AppState>()(
           const newTemplate = { ...template, id: uuidv4() } as TransactionTemplate;
           set((state) => ({ templates: [...state.templates, newTemplate] }));
           await syncToCloud(async () => { await firestoreService.addDocument('templates', newTemplate); });
+        },
+        updateTemplate: async (id, updatedFields) => {
+          set((state) => ({ templates: state.templates.map(t => t.id === id ? { ...t, ...updatedFields } : t) }));
+          await syncToCloud(async () => { await firestoreService.updateDocument('templates', id, updatedFields); });
         },
         deleteTemplate: async (id) => {
           set((state) => ({ templates: state.templates.filter(t => t.id !== id) }));
