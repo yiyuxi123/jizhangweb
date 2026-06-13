@@ -350,6 +350,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           <div className="space-y-4 w-full max-w-xs">
             <button
               onClick={loginWithGoogle}
+              aria-label="使用 Google 账号登录"
               className="w-full px-8 py-4 bg-white border border-gray-200 rounded-xl shadow-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center space-x-3"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
@@ -364,6 +365,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
  
             <button
               onClick={() => setIsGuestMode(true)}
+              aria-label="跳过登录，进入离线模式"
               className="w-full px-8 py-4 bg-emerald-50 border border-emerald-100 rounded-xl shadow-sm font-bold text-emerald-600 hover:bg-emerald-100 transition-colors flex items-center justify-center"
             >
               <span>跳过登录 (离线模式)</span>

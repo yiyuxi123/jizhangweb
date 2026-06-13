@@ -119,9 +119,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
+      <div role="dialog" aria-modal="true" aria-labelledby="settings-title" className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
-          <h2 className="text-xl font-bold text-gray-900">设置</h2>
+          <h2 id="settings-title" className="text-xl font-bold text-gray-900">设置</h2>
           <button onClick={handleClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
             <Icons.X size={24} />
           </button>

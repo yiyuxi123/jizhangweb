@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, User, PlusCircle } from './utils/icons';
+import React, { useState, useEffect, Suspense } from 'react';
+import { Home, List, PieChart, User, PlusCircle, Wallet } from './utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
-import Dashboard from './pages/Dashboard';
-import Transactions from './pages/Transactions';
-import Statistics from './pages/Statistics';
-import Accounts from './pages/Accounts';
-import AddTransactionModal from './components/AddTransactionModal';
 import { FirebaseProvider } from './components/FirebaseProvider';
 import { useStore } from './store/useStore';
+
+// Route-based lazy loading — splits the 1.5MB bundle into per-page chunks
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Transactions = React.lazy(() => import('./pages/Transactions'));
+const Statistics = React.lazy(() => import('./pages/Statistics'));
+const Accounts = React.lazy(() => import('./pages/Accounts'));
+const AddTransactionModal = React.lazy(() => import('./components/AddTransactionModal'));
+
+const PageFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="animate-spin text-emerald-400">
+      <Wallet size={32} />
+    </div>
+  </div>
+);
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('home');
@@ -102,10 +112,12 @@ function AppContent() {
             transition={pageTransition}
             className="min-h-full pb-24"
           >
-            {activeTab === 'home' && <Dashboard onNavigate={setActiveTab} />}
-            {activeTab === 'transactions' && <Transactions />}
-            {activeTab === 'statistics' && <Statistics />}
-            {activeTab === 'accounts' && <Accounts />}
+            <Suspense fallback={<PageFallback />}>
+              {activeTab === 'home' && <Dashboard onNavigate={setActiveTab} />}
+              {activeTab === 'transactions' && <Transactions />}
+              {activeTab === 'statistics' && <Statistics />}
+              {activeTab === 'accounts' && <Accounts />}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
@@ -127,10 +139,11 @@ function AppContent() {
         
         {/* Add Button */}
         <div className="relative -top-8">
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsAddModalOpen(true)}
+            aria-label="添加记账记录"
             className="bg-emerald-500 text-white p-4 rounded-full shadow-[0_8px_20px_rgba(16,185,129,0.3)] flex items-center justify-center"
           >
             <PlusCircle size={32} />
@@ -178,9 +191,17 @@ export default function App() {
 }
 
 const NavItem = React.memo(function NavItem({ icon, label, isActive, onClick }: { icon: React.ReactNode, label: string, isActive: boolean, onClick: () => void }) {
+  const ariaLabels: Record<string, string> = {
+    '首页': '首页导航',
+    '明细': '账单明细导航',
+    '统计': '统计图表导航',
+    '资产': '资产管理导航',
+  };
   return (
-    <button 
+    <button
       onClick={onClick}
+      aria-label={ariaLabels[label] || label}
+      aria-current={isActive ? 'page' : undefined}
       className={`flex flex-col items-center justify-center space-y-1 w-16 transition-colors duration-200 ${isActive ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
     >
       <motion.div
