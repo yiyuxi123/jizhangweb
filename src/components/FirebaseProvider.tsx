@@ -6,6 +6,10 @@ import { useStore } from '../store/useStore';
 import { Wallet, Icons } from '../utils/icons';
 import { v4 as uuidv4 } from 'uuid';
 
+// Alert type constants for dismiss tracking
+const ALERT_NETWORK_OFFLINE = 'network_offline';
+const ALERT_AUTH_TIMEOUT = 'auth_timeout';
+
 const initialCategories = [
   { name: '餐饮', type: 'expense', icon: 'Utensils', color: '#f59e0b' },
   { name: '交通', type: 'expense', icon: 'Bus', color: '#3b82f6' },
@@ -30,9 +34,51 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [user, setUser] = useState(auth.currentUser);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  const { isGuestMode, setIsGuestMode, wasLoggedIn, setWasLoggedIn, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings, syncToCloudNow } = useStore();
+  const { isGuestMode, setIsGuestMode, wasLoggedIn, setWasLoggedIn, setAccounts, setCategories, setTransactions, setBudgets, setTemplates, setGoals, syncSettings, syncToCloudNow, dismissedAlertTypes, dismissAlertType } = useStore();
 
   const [isCheckingNetwork, setIsCheckingNetwork] = useState(false);
+  const [alertType, setAlertType] = useState<string | null>(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [alertCountdown, setAlertCountdown] = useState(8);
+  const alertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const alertCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-dismiss alert after 8 seconds
+  useEffect(() => {
+    if (alertMessage) {
+      setAlertCountdown(8);
+      const countdownInterval = setInterval(() => {
+        setAlertCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      alertCountdownRef.current = countdownInterval;
+
+      alertTimerRef.current = setTimeout(() => {
+        handleDismissAlert();
+      }, 8000);
+
+      return () => {
+        clearInterval(countdownInterval);
+        if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+      };
+    }
+  }, [alertMessage]);
+
+  const handleDismissAlert = () => {
+    if (dontShowAgain && alertType) {
+      dismissAlertType(alertType);
+    }
+    if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+    if (alertCountdownRef.current) clearInterval(alertCountdownRef.current);
+    setAlertMessage(null);
+    setAlertType(null);
+    setDontShowAgain(false);
+  };
 
   useEffect(() => {
     if (!isAuthReady || user || isGuestMode) return;
@@ -51,7 +97,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } catch (error) {
         console.log("Network check failed, auto-enabling offline mode");
         setIsGuestMode(true);
-        setAlertMessage("检测到无法连接云端数据库（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
+        if (!dismissedAlertTypes.includes(ALERT_NETWORK_OFFLINE)) {
+          setAlertType(ALERT_NETWORK_OFFLINE);
+          setAlertMessage("检测到无法连接云端数据库（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
+        }
       } finally {
         setIsCheckingNetwork(false);
       }
@@ -81,7 +130,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const wasGuest = useStore.getState().isGuestMode;
         setIsAuthReady(true);
         useStore.getState().setIsGuestMode(true);
-        if (!wasGuest) {
+        if (!wasGuest && !useStore.getState().dismissedAlertTypes.includes(ALERT_AUTH_TIMEOUT)) {
+          setAlertType(ALERT_AUTH_TIMEOUT);
           setAlertMessage("连接云端服务超时（可能需要科学网络），已自动为您开启离线模式。您的数据将安全地保存在本地。");
         }
       }
@@ -332,16 +382,28 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {alertMessage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-500 mb-4 mx-auto animate-bounce">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-500 mb-4 mx-auto">
               <Icons.AlertCircle size={24} />
             </div>
             <h3 className="text-lg font-bold text-center text-gray-900 mb-2">网络及云同步提示</h3>
-            <p className="text-sm text-gray-500 text-center mb-6 leading-relaxed">{alertMessage}</p>
+            <p className="text-sm text-gray-500 text-center mb-4 leading-relaxed">{alertMessage}</p>
+
+            {/* Don't show again checkbox */}
+            <label className="flex items-center justify-center space-x-2 mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={dontShowAgain}
+                onChange={(e) => setDontShowAgain(e.target.checked)}
+                className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+              />
+              <span className="text-xs text-gray-500">不再显示此类提示</span>
+            </label>
+
             <button
-              onClick={() => setAlertMessage(null)}
+              onClick={handleDismissAlert}
               className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold transition-all shadow-md active:scale-95 text-sm"
             >
-              我知道了
+              我知道了{alertCountdown > 0 ? ` (${alertCountdown}s)` : ''}
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { format, isSameMonth, parseISO } from 'date-fns';
 import { Filter, Search, List, Calendar as CalendarIcon, Eye, EyeOff, Icons } from '../utils/icons';
@@ -11,7 +11,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
 export default function Transactions() {
-  const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables, syncError, setSyncError } = useStore();
+  const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables, syncError, setSyncError, dismissedAlertTypes, dismissAlertType } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income' | 'transfer'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
@@ -19,7 +19,57 @@ export default function Transactions() {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [collapsedMonths, setCollapsedMonths] = useState<Set<string>>(new Set());
-  
+
+  // Sync error auto-dismiss state
+  const [syncErrorDontShow, setSyncErrorDontShow] = useState(false);
+  const [syncErrorCountdown, setSyncErrorCountdown] = useState(8);
+  const syncErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncErrorCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const ALERT_SYNC_ERROR = 'sync_error';
+
+  // Auto-dismiss sync error after 8 seconds
+  useEffect(() => {
+    if (syncError) {
+      // Check if this type is permanently dismissed
+      if (dismissedAlertTypes.includes(ALERT_SYNC_ERROR)) {
+        setSyncError(null);
+        return;
+      }
+
+      setSyncErrorCountdown(8);
+      const countdownInterval = setInterval(() => {
+        setSyncErrorCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      syncErrorCountdownRef.current = countdownInterval;
+
+      syncErrorTimerRef.current = setTimeout(() => {
+        handleSyncErrorDismiss();
+      }, 8000);
+
+      return () => {
+        clearInterval(countdownInterval);
+        if (syncErrorTimerRef.current) clearTimeout(syncErrorTimerRef.current);
+      };
+    }
+  }, [syncError]);
+
+  const handleSyncErrorDismiss = () => {
+    if (syncErrorDontShow) {
+      dismissAlertType(ALERT_SYNC_ERROR);
+    }
+    if (syncErrorTimerRef.current) clearTimeout(syncErrorTimerRef.current);
+    if (syncErrorCountdownRef.current) clearInterval(syncErrorCountdownRef.current);
+    setSyncError(null);
+    setSyncErrorDontShow(false);
+  };
+
   // Batch Operations State
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -167,15 +217,31 @@ export default function Transactions() {
     <div className="p-4 space-y-6 max-w-md mx-auto">
       {/* Sync Error Banner */}
       {syncError && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm bg-red-50 border border-red-200 text-red-800 rounded-2xl shadow-lg p-4 animate-in slide-in-from-top-4 duration-300 flex items-start space-x-3">
-          <Icons.AlertCircle size={20} className="shrink-0 mt-0.5 text-red-500" />
-          <p className="text-sm font-medium flex-1 leading-relaxed">{syncError}</p>
-          <button
-            onClick={() => setSyncError(null)}
-            className="shrink-0 p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
-          >
-            <Icons.X size={16} />
-          </button>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm bg-red-50 border border-red-200 text-red-800 rounded-2xl shadow-lg p-4 animate-in slide-in-from-top-4 duration-300">
+          <div className="flex items-start space-x-3 mb-3">
+            <Icons.AlertCircle size={20} className="shrink-0 mt-0.5 text-red-500" />
+            <p className="text-sm font-medium flex-1 leading-relaxed">{syncError}</p>
+            <button
+              onClick={handleSyncErrorDismiss}
+              className="shrink-0 p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
+            >
+              <Icons.X size={16} />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={syncErrorDontShow}
+                onChange={(e) => setSyncErrorDontShow(e.target.checked)}
+                className="w-3.5 h-3.5 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+              />
+              <span className="text-xs text-red-600">不再显示同步错误</span>
+            </label>
+            <span className="text-xs text-red-400">
+              {syncErrorCountdown > 0 ? `${syncErrorCountdown}秒后自动关闭` : ''}
+            </span>
+          </div>
         </div>
       )}
       {/* Header */}

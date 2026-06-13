@@ -86,7 +86,10 @@ import {
   Search,
   BarChart3,
   ShieldCheck,
-  Loader2
+  Loader2,
+  BellOff,
+  Key,
+  Bell
 } from 'lucide-react';
 
 export {
@@ -177,7 +180,10 @@ export {
   Search,
   BarChart3,
   ShieldCheck,
-  Loader2
+  Loader2,
+  BellOff,
+  Key,
+  Bell
 };
 
 export const Icons = {
@@ -268,5 +274,8 @@ export const Icons = {
   Search,
   BarChart3,
   ShieldCheck,
-  Loader2
+  Loader2,
+  BellOff,
+  Key,
+  Bell
 };

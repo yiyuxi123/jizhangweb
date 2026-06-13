@@ -2,18 +2,35 @@ import React, { useState } from 'react';
 import { Icons } from '../utils/icons';
 import { useStore } from '../store/useStore';
 
+type SettingsTab = 'sync' | 'api' | 'notifications';
+
+const ALERT_TYPE_LABELS: Record<string, string> = {
+  network_offline: '网络离线提示',
+  auth_timeout: '登录超时提示',
+  sync_error: '同步失败提示',
+};
+
+const ALERT_TYPE_DESCRIPTIONS: Record<string, string> = {
+  network_offline: '当检测到无法连接云端服务时，自动提示并切换到离线模式',
+  auth_timeout: '当 Firebase 登录认证超时时，提示并自动切换到离线模式',
+  sync_error: '当数据同步到云端失败时，在账单明细页顶部显示错误信息',
+};
+
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { 
-    syncSettings, 
-    setSyncSettings, 
-    syncToCloudNow, 
+  const {
+    syncSettings,
+    setSyncSettings,
+    syncToCloudNow,
     pullFromCloud,
     deepseekApiKey,
     setDeepseekApiKey,
     qwenApiKey,
-    setQwenApiKey
+    setQwenApiKey,
+    dismissedAlertTypes,
+    resetDismissedAlertType
   } = useStore();
-  
+
+  const [activeTab, setActiveTab] = useState<SettingsTab>('sync');
   const [showConfirmSwitch, setShowConfirmSwitch] = useState(false);
   const [syncMessage, setSyncMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -92,14 +109,43 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
+  const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
+    { key: 'sync', label: '同步设置', icon: <Icons.RefreshCw size={16} /> },
+    { key: 'api', label: 'API 密钥', icon: <Icons.Key size={16} /> },
+    { key: 'notifications', label: '通知设置', icon: <Icons.Bell size={16} /> },
+  ];
+
+  const allKnownAlertTypes = ['network_offline', 'auth_timeout', 'sync_error'];
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
       <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
-          <h2 className="text-xl font-bold text-gray-900">同步与 AI 设置</h2>
+          <h2 className="text-xl font-bold text-gray-900">设置</h2>
           <button onClick={handleClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
             <Icons.X size={24} />
           </button>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-100 shrink-0">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 flex items-center justify-center space-x-1.5 py-3 text-sm font-medium transition-colors relative ${
+                activeTab === tab.key
+                  ? 'text-emerald-600'
+                  : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+              {activeTab === tab.key && (
+                <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-emerald-500 rounded-full" />
+              )}
+            </button>
+          ))}
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto relative flex-1">
@@ -113,163 +159,246 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Storage Mode */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">数据存储位置</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={handleSwitchToCloud}
-                className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
-                  syncSettings.storageMode === 'cloud' 
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700' 
-                    : 'border-gray-100 bg-white text-gray-500 hover:border-emerald-200'
-                }`}
-              >
-                <Icons.Cloud size={28} />
-                <span className="font-medium text-xs">云端同步 (Firestore)</span>
-              </button>
-              <button
-                onClick={() => setSyncSettings({ storageMode: 'local' })}
-                className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
-                  syncSettings.storageMode === 'local' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                    : 'border-gray-100 bg-white text-gray-500 hover:border-blue-200'
-                }`}
-              >
-                <Icons.HardDrive size={28} />
-                <span className="font-medium text-xs">仅本地 (Localhost)</span>
-              </button>
-            </div>
-            <p className="text-[10px] text-gray-400 leading-normal">
-              {syncSettings.storageMode === 'cloud' 
-                ? '数据将安全地保存在云端，支持多设备同步。' 
-                : '数据仅保存在当前设备，卸载应用或清空缓存会导致数据丢失。'}
-            </p>
-          </div>
+          {/* ===== SYNC TAB ===== */}
+          {activeTab === 'sync' && (
+            <>
+              {/* Storage Mode */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">数据存储位置</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleSwitchToCloud}
+                    className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
+                      syncSettings.storageMode === 'cloud'
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-gray-100 bg-white text-gray-500 hover:border-emerald-200'
+                    }`}
+                  >
+                    <Icons.Cloud size={28} />
+                    <span className="font-medium text-xs">云端同步 (Firestore)</span>
+                  </button>
+                  <button
+                    onClick={() => setSyncSettings({ storageMode: 'local' })}
+                    className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
+                      syncSettings.storageMode === 'local'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-100 bg-white text-gray-500 hover:border-blue-200'
+                    }`}
+                  >
+                    <Icons.HardDrive size={28} />
+                    <span className="font-medium text-xs">仅本地 (Localhost)</span>
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 leading-normal">
+                  {syncSettings.storageMode === 'cloud'
+                    ? '数据将安全地保存在云端，支持多设备同步。'
+                    : '数据仅保存在当前设备，卸载应用或清空缓存会导致数据丢失。'}
+                </p>
+              </div>
 
-          {/* Sync Frequency */}
-          {syncSettings.storageMode === 'cloud' && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">同步频率</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setSyncSettings({ syncFrequency: 'realtime' })}
-                  className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
-                    syncSettings.syncFrequency === 'realtime' 
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700' 
-                      : 'border-gray-100 bg-white text-gray-500 hover:border-emerald-200'
-                }`}
-                >
-                  <Icons.RefreshCw size={28} />
-                  <span className="font-medium text-xs">实时同步</span>
-                </button>
-                <button
-                  onClick={() => setSyncSettings({ syncFrequency: 'daily' })}
-                  className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
-                    syncSettings.syncFrequency === 'daily' 
-                      ? 'border-orange-500 bg-orange-50 text-orange-700' 
-                      : 'border-gray-100 bg-white text-gray-500 hover:border-orange-200'
-                  }`}
-                >
-                  <Icons.Clock size={28} />
-                  <span className="font-medium text-xs">手动/每日同步</span>
-                </button>
+              {/* Sync Frequency */}
+              {syncSettings.storageMode === 'cloud' && (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">同步频率</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setSyncSettings({ syncFrequency: 'realtime' })}
+                      className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
+                        syncSettings.syncFrequency === 'realtime'
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-gray-100 bg-white text-gray-500 hover:border-emerald-200'
+                      }`}
+                    >
+                      <Icons.RefreshCw size={28} />
+                      <span className="font-medium text-xs">实时同步</span>
+                    </button>
+                    <button
+                      onClick={() => setSyncSettings({ syncFrequency: 'daily' })}
+                      className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center space-y-2 transition-all ${
+                        syncSettings.syncFrequency === 'daily'
+                          ? 'border-orange-500 bg-orange-50 text-orange-700'
+                          : 'border-gray-100 bg-white text-gray-500 hover:border-orange-200'
+                      }`}
+                    >
+                      <Icons.Clock size={28} />
+                      <span className="font-medium text-xs">手动/每日同步</span>
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-400 leading-normal">
+                    {syncSettings.syncFrequency === 'realtime'
+                      ? '任何修改都会立即同步到云端。'
+                      : '修改将暂存本地，您可以手动点击下方按钮同步。'}
+                  </p>
+                </div>
+              )}
+
+              {/* Manual Sync Buttons */}
+              {(syncSettings.storageMode === 'local' || syncSettings.syncFrequency === 'daily') && (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">手动云端同步</h3>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={handleManualPull}
+                      disabled={isSyncing}
+                      className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-md hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center justify-center space-x-2 text-sm"
+                    >
+                      <Icons.Cloud size={18} />
+                      <span>{isSyncing ? '同步中...' : '从云端拉取'}</span>
+                    </button>
+                    <button
+                      onClick={handleManualPush}
+                      disabled={isSyncing}
+                      className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold shadow-md hover:bg-emerald-600 disabled:opacity-50 transition-colors flex items-center justify-center space-x-2 text-sm"
+                    >
+                      <Icons.RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
+                      <span>{isSyncing ? '同步中...' : '推送到云端'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ===== API TAB ===== */}
+          {activeTab === 'api' && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Icons.Sparkles size={18} className="text-violet-600 animate-pulse" />
+                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">AI 智能助理密钥设置</h3>
               </div>
               <p className="text-[10px] text-gray-400 leading-normal">
-                {syncSettings.syncFrequency === 'realtime' 
-                  ? '任何修改都会立即同步到云端。' 
-                  : '修改将暂存本地，您可以手动点击下方按钮同步。'}
+                密钥仅安全地保存在当前设备本地缓存 (IndexedDB) 中，不会在云端存储，也不会明文上传到第三方。
               </p>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1">DeepSeek API Key (智能记账与理财助手)</label>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showDsKey ? 'text' : 'password'}
+                      value={dsKey}
+                      onChange={e => handleDsKeyChange(e.target.value)}
+                      onBlur={handleDsBlur}
+                      placeholder="sk-..."
+                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowDsKey(!showDsKey)}
+                      className="absolute right-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showDsKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
+                    <span>没有密钥？点此去</span>
+                    <a href="https://platform.deepseek.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">DeepSeek 开放平台注册获取 ➔</a>
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1">Qwen API Key (账单小票/截图视觉识别)</label>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showQwKey ? 'text' : 'password'}
+                      value={qwKey}
+                      onChange={e => handleQwKeyChange(e.target.value)}
+                      onBlur={handleQwBlur}
+                      placeholder="sk-..."
+                      className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowQwKey(!showQwKey)}
+                      className="absolute right-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showQwKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
+                    <span>没有密钥？点此去</span>
+                    <a href="https://bailian.aliyun.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">阿里云百炼平台注册获取 ➔</a>
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Manual Sync Buttons */}
-          {(syncSettings.storageMode === 'local' || syncSettings.syncFrequency === 'daily') && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">手动云端同步</h3>
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleManualPull}
-                  disabled={isSyncing}
-                  className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-md hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center justify-center space-x-2 text-sm"
-                >
-                  <Icons.Cloud size={18} />
-                  <span>{isSyncing ? '同步中...' : '从云端拉取'}</span>
-                </button>
-                <button
-                  onClick={handleManualPush}
-                  disabled={isSyncing}
-                  className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold shadow-md hover:bg-emerald-600 disabled:opacity-50 transition-colors flex items-center justify-center space-x-2 text-sm"
-                >
-                  <Icons.RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
-                  <span>{isSyncing ? '同步中...' : '推送到云端'}</span>
-                </button>
+          {/* ===== NOTIFICATIONS TAB ===== */}
+          {activeTab === 'notifications' && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Icons.BellOff size={18} className="text-gray-500" />
+                <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">已关闭的提示消息</h3>
               </div>
+              <p className="text-[10px] text-gray-400 leading-normal">
+                当您在某条提示中选择"不再显示此类提示"后，该类提示将被永久关闭。您可以在此重新开启。
+              </p>
+
+              {allKnownAlertTypes.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <Icons.Bell size={32} className="mx-auto mb-2 opacity-30" />
+                  <p className="text-xs">没有可管理的提示类型</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {allKnownAlertTypes.map(alertType => {
+                    const isDismissed = dismissedAlertTypes.includes(alertType);
+                    return (
+                      <div
+                        key={alertType}
+                        className={`p-4 rounded-2xl border-2 transition-all ${
+                          isDismissed
+                            ? 'border-gray-200 bg-gray-50'
+                            : 'border-emerald-200 bg-emerald-50/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              {isDismissed ? (
+                                <Icons.BellOff size={16} className="text-gray-400 shrink-0" />
+                              ) : (
+                                <Icons.Bell size={16} className="text-emerald-500 shrink-0" />
+                              )}
+                              <span className={`text-sm font-bold ${isDismissed ? 'text-gray-500' : 'text-gray-900'}`}>
+                                {ALERT_TYPE_LABELS[alertType] || alertType}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1 ml-6">
+                              {ALERT_TYPE_DESCRIPTIONS[alertType] || ''}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (isDismissed) {
+                                resetDismissedAlertType(alertType);
+                              }
+                            }}
+                            disabled={!isDismissed}
+                            className={`ml-3 shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                              isDismissed
+                                ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-95 shadow-sm'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            }`}
+                          >
+                            {isDismissed ? '重新开启' : '已开启'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {dismissedAlertTypes.length === 0 && (
+                <div className="text-center py-6">
+                  <Icons.CheckCircle2 size={32} className="mx-auto mb-2 text-emerald-300" />
+                  <p className="text-xs text-gray-400">所有提示消息均已开启</p>
+                </div>
+              )}
             </div>
           )}
-
-          {/* AI Settings Section */}
-          <div className="space-y-4 pt-4 border-t border-gray-100">
-            <div className="flex items-center space-x-2">
-              <Icons.Sparkles size={18} className="text-violet-600 animate-pulse" />
-              <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">AI 智能助理密钥设置</h3>
-            </div>
-            <p className="text-[10px] text-gray-400 leading-normal">
-              密钥仅安全地保存在当前设备本地缓存 (IndexedDB) 中，不会在云端存储，也不会明文上传到第三方。
-            </p>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1">DeepSeek API Key (智能记账与理财助手)</label>
-                <div className="relative flex items-center">
-                  <input
-                    type={showDsKey ? 'text' : 'password'}
-                    value={dsKey}
-                    onChange={e => handleDsKeyChange(e.target.value)}
-                    onBlur={handleDsBlur}
-                    placeholder="sk-..."
-                    className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowDsKey(!showDsKey)}
-                    className="absolute right-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showDsKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
-                  </button>
-                </div>
-                <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
-                  <span>没有密钥？点此去</span>
-                  <a href="https://platform.deepseek.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">DeepSeek 开放平台注册获取 ➔</a>
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1">Qwen API Key (账单小票/截图视觉识别)</label>
-                <div className="relative flex items-center">
-                  <input
-                    type={showQwKey ? 'text' : 'password'}
-                    value={qwKey}
-                    onChange={e => handleQwKeyChange(e.target.value)}
-                    onBlur={handleQwBlur}
-                    placeholder="sk-..."
-                    className="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 outline-none text-sm font-medium text-gray-900"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowQwKey(!showQwKey)}
-                    className="absolute right-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showQwKey ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
-                  </button>
-                </div>
-                <p className="text-[10px] text-gray-400 mt-1.5 flex items-center justify-between">
-                  <span>没有密钥？点此去</span>
-                  <a href="https://bailian.aliyun.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 font-bold hover:underline">阿里云百炼平台注册获取 ➔</a>
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

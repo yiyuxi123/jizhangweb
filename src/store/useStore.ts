@@ -49,6 +49,10 @@ interface AppState {
   syncError: string | null;
   setSyncError: (error: string | null) => void;
 
+  dismissedAlertTypes: string[];
+  dismissAlertType: (type: string) => void;
+  resetDismissedAlertType: (type: string) => void;
+
   tombstones: Record<string, { id: string; entityType: string; deletedAt: number }>;
   addTombstone: (id: string, entityType: string) => void;
 
@@ -159,6 +163,16 @@ export const useStore = create<AppState>()(
 
         syncError: null,
         setSyncError: (error) => set({ syncError: error }),
+
+        dismissedAlertTypes: [],
+        dismissAlertType: (type) => set((state) => ({
+          dismissedAlertTypes: state.dismissedAlertTypes.includes(type)
+            ? state.dismissedAlertTypes
+            : [...state.dismissedAlertTypes, type]
+        })),
+        resetDismissedAlertType: (type) => set((state) => ({
+          dismissedAlertTypes: state.dismissedAlertTypes.filter(t => t !== type)
+        })),
 
         tombstones: {},
         addTombstone: (id, entityType) => set((state) => ({
@@ -1384,7 +1398,8 @@ export const useStore = create<AppState>()(
         wasLoggedIn: state.wasLoggedIn,
         tombstones: state.tombstones,
         deepseekApiKey: state.deepseekApiKey,
-        qwenApiKey: state.qwenApiKey
+        qwenApiKey: state.qwenApiKey,
+        dismissedAlertTypes: state.dismissedAlertTypes
       }),
     }
   )
