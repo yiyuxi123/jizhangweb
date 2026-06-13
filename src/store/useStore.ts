@@ -115,14 +115,16 @@ export const useStore = create<AppState>()(
           } catch (e: any) {
             console.error("Cloud sync failed", e);
             const msg = e?.message || String(e);
-            if (msg.includes('exceeds') || msg.includes('size') || msg.includes('1')) {
-              set({ syncError: '数据过大，云端同步失败。请检查是否有过大的图片附件（>1MB），建议压缩后重试。' });
+            const code = e?.code || '';
+            const fullMsg = `[${code}] ${msg}`;
+            if (msg.includes('exceeds') || msg.includes('size') || code === 'out-of-range') {
+              set({ syncError: `数据过大：${fullMsg}\n\n可能是图片附件过大，已自动压缩处理。` });
             } else if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
-              set({ syncError: '云端权限校验失败，安全规则可能需要更新。请在 Firebase 控制台更新 Firestore 规则。' });
-            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout')) {
-              set({ syncError: '网络连接失败，无法访问云端。请检查网络后重试。' });
+              set({ syncError: `权限被拒：${fullMsg}\n\n请在 Firebase 控制台检查安全规则。` });
+            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout') || code === 'unavailable') {
+              set({ syncError: `网络错误：${fullMsg}\n\n请确认网络能访问 Google 服务。` });
             } else {
-              set({ syncError: `云端同步失败: ${msg}` });
+              set({ syncError: `云端同步失败: ${fullMsg}` });
             }
             set({ syncStatus: 'error' });
           }
@@ -626,7 +628,22 @@ export const useStore = create<AppState>()(
               operations.push({ ref: doc(db, `users/${userId}/categories`, cat.id), data: { ...cat, userId } });
             });
             state.transactions.forEach(tx => {
-              operations.push({ ref: doc(db, `users/${userId}/transactions`, tx.id), data: { ...tx, userId } });
+              // Strip oversized images from old data (>200KB base64 ≈ 150KB JPEG)
+              let cleanTx = { ...tx, userId };
+              if (typeof cleanTx.image === 'string' && cleanTx.image.length > 200_000) {
+                console.warn(`Stripping oversized image (${cleanTx.image.length} chars) from tx ${tx.id}`);
+                delete cleanTx.image;
+                // Also clean the local copy
+                const localTx = get().transactions.find(t => t.id === tx.id);
+                if (localTx && localTx.image) {
+                  set((state) => ({
+                    transactions: state.transactions.map(t =>
+                      t.id === tx.id ? { ...t, image: undefined } : t
+                    )
+                  }));
+                }
+              }
+              operations.push({ ref: doc(db, `users/${userId}/transactions`, tx.id), data: cleanTx });
             });
             state.budgets.forEach(b => {
               operations.push({ ref: doc(db, `users/${userId}/budgets`, b.id), data: { ...b, userId } });
@@ -681,14 +698,16 @@ export const useStore = create<AppState>()(
           } catch (e: any) {
             console.error("Failed to syncToCloudNow:", e);
             const msg = e?.message || String(e);
-            if (msg.includes('exceeds') || msg.includes('size')) {
-              set({ syncError: '同步失败：部分数据过大（如图片附件 >1MB）。请删除过大附件后重试。' });
+            const code = e?.code || '';
+            const fullMsg = `[${code}] ${msg}`;
+            if (msg.includes('exceeds') || msg.includes('size') || code === 'out-of-range') {
+              set({ syncError: `数据过大无法同步：${msg}\n\n请删除过大的图片附件，或清空旧数据后重试。` });
             } else if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
-              set({ syncError: '同步失败：云端权限不足，请检查 Firestore 安全规则是否已更新。' });
-            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout')) {
-              set({ syncError: '同步失败：无法连接云端服务器，请检查网络。' });
+              set({ syncError: `权限不足：${msg}\n\n请在 Firebase 控制台检查 Firestore 安全规则。` });
+            } else if (msg.includes('unavailable') || msg.includes('network') || msg.includes('timeout') || code === 'unavailable') {
+              set({ syncError: `网络错误：${fullMsg}\n\n请确认设备能访问 Google 服务（Firestore）。` });
             } else {
-              set({ syncError: `云端同步失败: ${msg}` });
+              set({ syncError: `云端同步失败: ${fullMsg}` });
             }
             set({ syncStatus: 'error' });
             throw e;
