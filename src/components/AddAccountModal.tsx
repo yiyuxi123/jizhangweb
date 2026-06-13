@@ -9,6 +9,7 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
   const [balance, setBalance] = useState('');
   const [autoDepositAmount, setAutoDepositAmount] = useState('');
   const [autoDepositDay, setAutoDepositDay] = useState('');
+  const [fundType, setFundType] = useState<'working' | 'investment' | 'unavailable'>('working');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +37,8 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
       color,
       icon,
       autoDepositAmount: type === 'auto_deposit' && autoDepositAmount ? Number(autoDepositAmount) : undefined,
-      autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined
+      autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined,
+      fundType
     });
     onClose();
   };
@@ -77,6 +79,19 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
               <option value="wechat">微信</option>
               <option value="credit">信用卡</option>
               <option value="auto_deposit">自动入账 (如公积金/医保)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">资金分类</label>
+            <select 
+              value={fundType} 
+              onChange={e => setFundType(e.target.value as any)}
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+            >
+              <option value="working">流动资金 (现金/微信/支付宝/储蓄卡等)</option>
+              <option value="investment">投资资金 (股票/基金/理财等)</option>
+              <option value="unavailable">不可用资金 (定期/冻结/公积金等)</option>
             </select>
           </div>
 

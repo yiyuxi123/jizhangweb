@@ -4,12 +4,12 @@ import { Account, Budget, Category, Transaction, TransactionTemplate, SavingGoal
 import { v4 as uuidv4 } from 'uuid';
 
 export const firestoreService = {
-  async addTransaction(transaction: Omit<Transaction, 'id'>, currentAccounts: Account[], currentTransactions: Transaction[]) {
+  async addTransaction(transaction: Transaction, currentAccounts: Account[], currentTransactions: Transaction[]) {
     const userId = auth.currentUser?.uid;
     if (!userId) throw new Error("User not authenticated");
 
     const batch = writeBatch(db);
-    const newId = uuidv4();
+    const newId = transaction.id || uuidv4();
     const newTx: any = { ...transaction, id: newId, userId };
     
     // Remove undefined values
@@ -27,18 +27,17 @@ export const firestoreService = {
       });
     }
 
-    // Update accounts
+    // Update accounts (sync the pre-calculated balance from local state)
+    const changedAccountIds = new Set<string>();
+    if (newTx.type === 'expense' && newTx.fromAccountId) changedAccountIds.add(newTx.fromAccountId);
+    if (newTx.type === 'income' && newTx.toAccountId) changedAccountIds.add(newTx.toAccountId);
+    if (newTx.type === 'transfer') {
+      if (newTx.fromAccountId) changedAccountIds.add(newTx.fromAccountId);
+      if (newTx.toAccountId) changedAccountIds.add(newTx.toAccountId);
+    }
     currentAccounts.forEach(acc => {
-      let balanceChange = 0;
-      if (newTx.type === 'expense' && acc.id === newTx.fromAccountId) balanceChange -= newTx.amount;
-      if (newTx.type === 'income' && acc.id === newTx.toAccountId) balanceChange += newTx.amount;
-      if (newTx.type === 'transfer') {
-        if (acc.id === newTx.fromAccountId) balanceChange -= newTx.amount;
-        if (acc.id === newTx.toAccountId) balanceChange += newTx.amount;
-      }
-      if (balanceChange !== 0) {
-        const newBalance = Math.round((acc.balance + balanceChange) * 100) / 100;
-        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: newBalance });
+      if (changedAccountIds.has(acc.id)) {
+        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: Math.round(acc.balance * 100) / 100 });
       }
     });
 
@@ -92,26 +91,23 @@ export const firestoreService = {
       });
     }
 
-    // Revert old transaction effect and apply new transaction effect
+    // Update accounts (sync the pre-calculated balance from local state)
+    const changedAccountIds = new Set<string>();
+    if (oldTransaction.type === 'expense' && oldTransaction.fromAccountId) changedAccountIds.add(oldTransaction.fromAccountId);
+    if (oldTransaction.type === 'income' && oldTransaction.toAccountId) changedAccountIds.add(oldTransaction.toAccountId);
+    if (oldTransaction.type === 'transfer') {
+      if (oldTransaction.fromAccountId) changedAccountIds.add(oldTransaction.fromAccountId);
+      if (oldTransaction.toAccountId) changedAccountIds.add(oldTransaction.toAccountId);
+    }
+    if (newTransaction.type === 'expense' && newTransaction.fromAccountId) changedAccountIds.add(newTransaction.fromAccountId);
+    if (newTransaction.type === 'income' && newTransaction.toAccountId) changedAccountIds.add(newTransaction.toAccountId);
+    if (newTransaction.type === 'transfer') {
+      if (newTransaction.fromAccountId) changedAccountIds.add(newTransaction.fromAccountId);
+      if (newTransaction.toAccountId) changedAccountIds.add(newTransaction.toAccountId);
+    }
     currentAccounts.forEach(acc => {
-      let balance = acc.balance;
-      // revert
-      if (oldTransaction.type === 'expense' && acc.id === oldTransaction.fromAccountId) balance += oldTransaction.amount;
-      if (oldTransaction.type === 'income' && acc.id === oldTransaction.toAccountId) balance -= oldTransaction.amount;
-      if (oldTransaction.type === 'transfer') {
-        if (acc.id === oldTransaction.fromAccountId) balance += oldTransaction.amount;
-        if (acc.id === oldTransaction.toAccountId) balance -= oldTransaction.amount;
-      }
-      // apply
-      if (newTransaction.type === 'expense' && acc.id === newTransaction.fromAccountId) balance -= newTransaction.amount;
-      if (newTransaction.type === 'income' && acc.id === newTransaction.toAccountId) balance += newTransaction.amount;
-      if (newTransaction.type === 'transfer') {
-        if (acc.id === newTransaction.fromAccountId) balance -= newTransaction.amount;
-        if (acc.id === newTransaction.toAccountId) balance += newTransaction.amount;
-      }
-      
-      if (balance !== acc.balance) {
-        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: Math.round(balance * 100) / 100 });
+      if (changedAccountIds.has(acc.id)) {
+        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: Math.round(acc.balance * 100) / 100 });
       }
     });
 
@@ -139,16 +135,17 @@ export const firestoreService = {
       }
     }
 
+    // Update accounts (sync the pre-calculated balance from local state)
+    const changedAccountIds = new Set<string>();
+    if (transaction.type === 'expense' && transaction.fromAccountId) changedAccountIds.add(transaction.fromAccountId);
+    if (transaction.type === 'income' && transaction.toAccountId) changedAccountIds.add(transaction.toAccountId);
+    if (transaction.type === 'transfer') {
+      if (transaction.fromAccountId) changedAccountIds.add(transaction.fromAccountId);
+      if (transaction.toAccountId) changedAccountIds.add(transaction.toAccountId);
+    }
     currentAccounts.forEach(acc => {
-      let balance = acc.balance;
-      if (transaction.type === 'expense' && acc.id === transaction.fromAccountId) balance += transaction.amount;
-      if (transaction.type === 'income' && acc.id === transaction.toAccountId) balance -= transaction.amount;
-      if (transaction.type === 'transfer') {
-        if (acc.id === transaction.fromAccountId) balance += transaction.amount;
-        if (acc.id === transaction.toAccountId) balance -= transaction.amount;
-      }
-      if (balance !== acc.balance) {
-        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: Math.round(balance * 100) / 100 });
+      if (changedAccountIds.has(acc.id)) {
+        batch.update(doc(db, `users/${userId}/accounts`, acc.id), { balance: Math.round(acc.balance * 100) / 100 });
       }
     });
 
@@ -171,7 +168,7 @@ export const firestoreService = {
   async addDocument(collectionName: string, data: any) {
     const userId = auth.currentUser?.uid;
     if (!userId) throw new Error("User not authenticated");
-    const id = uuidv4();
+    const id = data.id || uuidv4();
     const cleanData = { ...data, id, userId };
     Object.keys(cleanData).forEach(key => {
       if (cleanData[key] === undefined) delete cleanData[key];

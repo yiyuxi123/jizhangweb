@@ -23,6 +23,7 @@ export interface Account {
   autoDepositAmount?: number;
   autoDepositDay?: number;
   order?: number;
+  fundType?: 'working' | 'investment' | 'unavailable';
 }
 
 export interface SyncSettings {

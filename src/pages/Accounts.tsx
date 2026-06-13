@@ -57,6 +57,12 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
     'credit': '信用卡',
     'auto_deposit': '自动入账'
   };
+  const fundTypeLabels: Record<string, { label: string, colorClass: string }> = {
+    'working': { label: '流动', colorClass: 'bg-blue-50 text-blue-600 border-blue-100/50' },
+    'investment': { label: '投资', colorClass: 'bg-purple-50 text-purple-600 border-purple-100/50' },
+    'unavailable': { label: '不可用', colorClass: 'bg-amber-50 text-amber-600 border-amber-100/50' }
+  };
+  const fundInfo = fundTypeLabels[account.fundType || 'working'];
 
   return (
     <div 
@@ -80,7 +86,12 @@ const SortableAccountItem: React.FC<{ account: Account, isReordering: boolean, o
         </div>
         <div>
           <h4 className="font-bold text-gray-900">{account.name}</h4>
-          <p className="text-xs text-gray-500 mt-0.5">{typeLabels[account.type] || account.type}</p>
+          <div className="flex items-center space-x-1.5 mt-0.5">
+            <span className="text-xs text-gray-500">{typeLabels[account.type] || account.type}</span>
+            <span className={`text-[10px] px-1 py-0.2 rounded border font-medium leading-none ${fundInfo.colorClass}`}>
+              {fundInfo.label}
+            </span>
+          </div>
         </div>
       </div>
       <div className="text-right">
@@ -115,6 +126,12 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
     'credit': '信用卡',
     'auto_deposit': '自动入账'
   };
+  const fundTypeLabels: Record<string, { label: string, colorClass: string }> = {
+    'working': { label: '流动', colorClass: 'bg-blue-50 text-blue-600 border-blue-100/50' },
+    'investment': { label: '投资', colorClass: 'bg-purple-50 text-purple-600 border-purple-100/50' },
+    'unavailable': { label: '不可用', colorClass: 'bg-amber-50 text-amber-600 border-amber-100/50' }
+  };
+  const fundInfo = fundTypeLabels[account.fundType || 'working'];
 
   return (
     <div 
@@ -138,7 +155,12 @@ const SortableHiddenAccountItem: React.FC<{ account: Account, isReordering: bool
         </div>
         <div>
           <h4 className="font-bold text-gray-900">{account.name}</h4>
-          <p className="text-xs text-gray-500 mt-0.5">{typeLabels[account.type] || account.type}</p>
+          <div className="flex items-center space-x-1.5 mt-0.5">
+            <span className="text-xs text-gray-500">{typeLabels[account.type] || account.type}</span>
+            <span className={`text-[10px] px-1 py-0.2 rounded border font-medium leading-none ${fundInfo.colorClass}`}>
+              {fundInfo.label}
+            </span>
+          </div>
         </div>
       </div>
       <div className="text-right">
@@ -185,16 +207,33 @@ export default function Accounts() {
     }
   };
 
-  const { totalBalance, totalAssets, totalLiabilities } = useMemo(() => {
+  const { totalBalance, totalAssets, totalLiabilities, workingFunds, investmentFunds, unavailableFunds } = useMemo(() => {
     let balance = 0;
     let assets = 0;
     let liabilities = 0;
+    let working = 0;
+    let investment = 0;
+    let unavailable = 0;
     accounts.forEach(a => {
       balance += a.balance;
-      if (a.balance > 0) assets += a.balance;
-      if (a.balance < 0) liabilities += Math.abs(a.balance);
+      if (a.balance > 0) {
+        assets += a.balance;
+        const fType = a.fundType || 'working';
+        if (fType === 'working') working += a.balance;
+        else if (fType === 'investment') investment += a.balance;
+        else if (fType === 'unavailable') unavailable += a.balance;
+      } else if (a.balance < 0) {
+        liabilities += Math.abs(a.balance);
+      }
     });
-    return { totalBalance: balance, totalAssets: assets, totalLiabilities: liabilities };
+    return { 
+      totalBalance: balance, 
+      totalAssets: assets, 
+      totalLiabilities: liabilities,
+      workingFunds: working,
+      investmentFunds: investment,
+      unavailableFunds: unavailable
+    };
   }, [accounts]);
 
   const exportToCSV = async (filename: string, rows: string[][]) => {
@@ -389,9 +428,9 @@ export default function Accounts() {
       {/* Net Worth Card */}
       <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-3xl shadow-lg text-white">
         <p className="text-emerald-100 text-sm font-medium mb-1">净资产 (CNY)</p>
-        <h2 className="text-4xl font-bold mb-6">¥{totalBalance.toFixed(2)}</h2>
+        <h2 className="text-4xl font-bold mb-4">¥{totalBalance.toFixed(2)}</h2>
         
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-emerald-400/30">
+        <div className="grid grid-cols-2 gap-4 py-4 border-t border-emerald-400/30">
           <div>
             <p className="text-emerald-100 text-xs font-medium mb-1">总资产</p>
             <p className="text-lg font-bold">¥{totalAssets.toFixed(2)}</p>
@@ -399,6 +438,21 @@ export default function Accounts() {
           <div>
             <p className="text-emerald-100 text-xs font-medium mb-1">总负债</p>
             <p className="text-lg font-bold">¥{totalLiabilities.toFixed(2)}</p>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-emerald-400/30 grid grid-cols-3 gap-2 text-center">
+          <div>
+            <p className="text-emerald-100 text-[10px] font-medium mb-0.5">流动资金</p>
+            <p className="text-sm font-semibold">¥{workingFunds.toFixed(0)}</p>
+          </div>
+          <div>
+            <p className="text-emerald-100 text-[10px] font-medium mb-0.5">投资资金</p>
+            <p className="text-sm font-semibold">¥{investmentFunds.toFixed(0)}</p>
+          </div>
+          <div>
+            <p className="text-emerald-100 text-[10px] font-medium mb-0.5">不可用资金</p>
+            <p className="text-sm font-semibold">¥{unavailableFunds.toFixed(0)}</p>
           </div>
         </div>
       </div>

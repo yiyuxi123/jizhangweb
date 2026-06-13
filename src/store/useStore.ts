@@ -161,7 +161,7 @@ export const useStore = create<AppState>()(
           }));
 
           await syncToCloud(async () => {
-            await firestoreService.addTransaction(transaction, get().accounts, get().transactions);
+            await firestoreService.addTransaction(newTx, get().accounts, get().transactions);
           });
         },
 
@@ -284,11 +284,21 @@ export const useStore = create<AppState>()(
           }
         },
         reorderAccountsList: async (reorderedAccounts) => {
-          // Update orders based on the new array index
-          const updatedAccounts = reorderedAccounts.map((acc, index) => ({ ...acc, order: index }));
+          // Calculate only those accounts whose order has changed to minimize DB writes
+          const updatedAccounts: Account[] = [];
+          const currentAccounts = get().accounts;
           
+          reorderedAccounts.forEach((acc, index) => {
+            const currentAcc = currentAccounts.find(a => a.id === acc.id);
+            if (!currentAcc || currentAcc.order !== index) {
+              updatedAccounts.push({ ...acc, order: index });
+            }
+          });
+
+          if (updatedAccounts.length === 0) return;
+
           // Merge with existing accounts (in case some were hidden/filtered)
-          const allAccounts = get().accounts.map(acc => {
+          const allAccounts = currentAccounts.map(acc => {
             const updated = updatedAccounts.find(ua => ua.id === acc.id);
             return updated ? updated : acc;
           }).sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -358,9 +368,20 @@ export const useStore = create<AppState>()(
           }
         },
         reorderCategoriesList: async (reorderedCategories) => {
-          const updatedCategories = reorderedCategories.map((cat, index) => ({ ...cat, order: index }));
+          // Calculate only those categories whose order has changed to minimize DB writes
+          const updatedCategories: Category[] = [];
+          const currentCategories = get().categories;
           
-          const allCategories = get().categories.map(cat => {
+          reorderedCategories.forEach((cat, index) => {
+            const currentCat = currentCategories.find(c => c.id === cat.id);
+            if (!currentCat || currentCat.order !== index) {
+              updatedCategories.push({ ...cat, order: index });
+            }
+          });
+
+          if (updatedCategories.length === 0) return;
+
+          const allCategories = currentCategories.map(cat => {
             const updated = updatedCategories.find(uc => uc.id === cat.id);
             return updated ? updated : cat;
           }).sort((a, b) => (a.order || 0) - (b.order || 0));

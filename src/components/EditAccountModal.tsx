@@ -11,6 +11,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
   const [isHidden, setIsHidden] = useState(account.isHidden || false);
   const [autoDepositAmount, setAutoDepositAmount] = useState(account.autoDepositAmount ? account.autoDepositAmount.toString() : '');
   const [autoDepositDay, setAutoDepositDay] = useState(account.autoDepositDay ? account.autoDepositDay.toString() : '');
+  const [fundType, setFundType] = useState<'working' | 'investment' | 'unavailable'>(account.fundType || 'working');
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
     setIsHidden(account.isHidden || false);
     setAutoDepositAmount(account.autoDepositAmount ? account.autoDepositAmount.toString() : '');
     setAutoDepositDay(account.autoDepositDay ? account.autoDepositDay.toString() : '');
+    setFundType(account.fundType || 'working');
     setShowConfirm(false);
   }, [account]);
 
@@ -50,7 +52,8 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
       icon,
       isHidden,
       autoDepositAmount: type === 'auto_deposit' && autoDepositAmount ? Number(autoDepositAmount) : undefined,
-      autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined
+      autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined,
+      fundType
     });
     onClose();
   };
@@ -96,6 +99,19 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
               <option value="wechat">微信</option>
               <option value="credit">信用卡</option>
               <option value="auto_deposit">自动入账 (如公积金/医保)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">资金分类</label>
+            <select 
+              value={fundType} 
+              onChange={e => setFundType(e.target.value as any)}
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+            >
+              <option value="working">流动资金 (现金/微信/支付宝/储蓄卡等)</option>
+              <option value="investment">投资资金 (股票/基金/理财等)</option>
+              <option value="unavailable">不可用资金 (定期/冻结/公积金等)</option>
             </select>
           </div>
 
