@@ -15,6 +15,15 @@ import { Share } from '@capacitor/share';
 export default function Transactions() {
   const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables, syncError, setSyncError, dismissedAlertTypes, dismissAlertType } = useStore();
   
+  // Get unique months for filter
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    transactions.forEach(t => {
+      months.add(format(parseISO(t.date), 'yyyy-MM'));
+    });
+    return Array.from(months).sort().reverse(); // Newest first
+  }, [transactions]);
+
   const monthOptions = React.useMemo(() => {
     const opts = [{ value: 'all', label: '全部月份' }];
     availableMonths.forEach(month => {
@@ -124,14 +133,6 @@ export default function Transactions() {
     setShowBatchDeleteConfirm(false);
   };
 
-  // Get unique months for filter
-  const availableMonths = useMemo(() => {
-    const months = new Set<string>();
-    transactions.forEach(t => {
-      months.add(format(parseISO(t.date), 'yyyy-MM'));
-    });
-    return Array.from(months).sort().reverse(); // Newest first
-  }, [transactions]);
 
   const filteredTransactions = useMemo(() => {
     const isReimbursableTx = (t: Transaction) => {
