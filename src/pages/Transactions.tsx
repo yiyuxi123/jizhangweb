@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
+import CustomSelect from '../components/CustomSelect';
 import { format, isSameMonth, parseISO } from 'date-fns';
 import { Filter, Search, List, Calendar as CalendarIcon, Eye, EyeOff, Icons } from '../utils/icons';
 import { motion, AnimatePresence } from 'motion/react';
@@ -13,6 +14,29 @@ import { Share } from '@capacitor/share';
 
 export default function Transactions() {
   const { transactions, categories, accounts, showReimbursables, toggleShowReimbursables, syncError, setSyncError, dismissedAlertTypes, dismissAlertType } = useStore();
+  
+  const monthOptions = React.useMemo(() => {
+    const opts = [{ value: 'all', label: '全部月份' }];
+    availableMonths.forEach(month => {
+      opts.push({
+        value: month,
+        label: format(parseISO(`${month}-01`), 'yyyy年MM月')
+      });
+    });
+    return opts;
+  }, [availableMonths]);
+
+  const accountOptions = React.useMemo(() => {
+    const opts = [{ value: 'all', label: '全部账户' }];
+    accounts.forEach(acc => {
+      opts.push({
+        value: acc.id,
+        label: acc.name
+      });
+    });
+    return opts;
+  }, [accounts]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income' | 'transfer'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
@@ -293,34 +317,20 @@ export default function Transactions() {
           </div>
           <div className="flex space-x-2">
             <div className="relative flex-1">
-              <select
+              <CustomSelect
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
-              >
-                <option value="all">全部月份</option>
-                {availableMonths.map(month => (
-                  <option key={month} value={month}>
-                    {format(parseISO(`${month}-01`), 'yyyy年MM月')}
-                  </option>
-                ))}
-              </select>
-              <Filter size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                onChange={val => setSelectedMonth(val)}
+                options={monthOptions}
+                triggerClassName="w-full pl-3 pr-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 outline-none text-sm font-medium flex justify-between items-center text-left cursor-pointer transition-colors"
+              />
             </div>
             <div className="relative flex-1">
-              <select
+              <CustomSelect
                 value={selectedAccount}
-                onChange={(e) => setSelectedAccount(e.target.value)}
-                className="w-full appearance-none pl-3 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm font-medium"
-              >
-                <option value="all">全部账户</option>
-                {accounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.name}
-                  </option>
-                ))}
-              </select>
-              <Icons.CreditCard size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                onChange={val => setSelectedAccount(val)}
+                options={accountOptions}
+                triggerClassName="w-full pl-3 pr-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 outline-none text-sm font-medium flex justify-between items-center text-left cursor-pointer transition-colors"
+              />
             </div>
           </div>
         </div>

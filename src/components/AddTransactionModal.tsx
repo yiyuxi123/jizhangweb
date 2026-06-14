@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import CustomSelect from './CustomSelect';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { parseOneSentence, parseReceiptImage } from '../services/aiService';
 import TemplateModal from './TemplateModal';
@@ -15,6 +16,13 @@ import { compressImage } from '../lib/utils';
 
 export default function AddTransactionModal({ isOpen, onClose, initialTransaction }: { isOpen: boolean, onClose: () => void, initialTransaction?: Transaction, key?: string | number }) {
   const { categories, accounts, addTransaction, updateTransaction, transactions, templates } = useStore();
+  
+  const accountOptions = React.useMemo(() => {
+    return accounts.map(acc => ({
+      value: acc.id,
+      label: `${acc.name} (余额: ¥${acc.balance.toFixed(2)})`
+    }));
+  }, [accounts]);
   const [type, setType] = useState<'expense' | 'income' | 'transfer'>('expense');
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -644,15 +652,11 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   {type === 'transfer' ? '转出账户' : '付款账户'}
                 </label>
-                <select 
+                <CustomSelect 
                   value={fromAccountId} 
-                  onChange={e => setFromAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                >
-                  {accounts.map(acc => (
-                    <option key={acc.id} value={acc.id}>{acc.name} (余额: ¥{acc.balance})</option>
-                  ))}
-                </select>
+                  onChange={val => setFromAccountId(val)}
+                  options={accountOptions}
+                />
               </div>
             )}
 
@@ -661,15 +665,11 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   {type === 'transfer' ? '转入账户' : '收款账户'}
                 </label>
-                <select 
+                <CustomSelect 
                   value={toAccountId} 
-                  onChange={e => setToAccountId(e.target.value)}
-                  className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                >
-                  {accounts.map(acc => (
-                    <option key={acc.id} value={acc.id}>{acc.name} (余额: ¥{acc.balance})</option>
-                  ))}
-                </select>
+                  onChange={val => setToAccountId(val)}
+                  options={accountOptions}
+                />
               </div>
             )}
           </div>

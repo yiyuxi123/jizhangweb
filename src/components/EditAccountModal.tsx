@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { X, Check, Trash2 } from '../utils/icons';
 import { useStore } from '../store/useStore';
 import { Account } from '../types';
+import CustomSelect from './CustomSelect';
+
+const typeOptions = [
+  { value: 'bank', label: '银行卡' },
+  { value: 'cash', label: '现金' },
+  { value: 'alipay', label: '支付宝' },
+  { value: 'wechat', label: '微信' },
+  { value: 'credit', label: '信用卡' },
+  { value: 'auto_deposit', label: '自动入账 (如公积金/医保)' }
+];
+
+const fundTypeOptions = [
+  { value: 'working', label: '流动资金', desc: '现金/微信/支付宝/储蓄卡等' },
+  { value: 'investment', label: '投资资金', desc: '股票/基金/理财等' },
+  { value: 'unavailable', label: '不可用资金', desc: '定期/冻结/公积金等' }
+];
 
 export default function EditAccountModal({ account, onClose }: { account: Account, onClose: () => void }) {
   const { updateAccount, deleteAccount, accounts } = useStore();
@@ -88,31 +104,20 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">账户类型</label>
-            <select 
+            <CustomSelect 
               value={type} 
-              onChange={e => setType(e.target.value as any)}
-              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-            >
-              <option value="bank">银行卡</option>
-              <option value="cash">现金</option>
-              <option value="alipay">支付宝</option>
-              <option value="wechat">微信</option>
-              <option value="credit">信用卡</option>
-              <option value="auto_deposit">自动入账 (如公积金/医保)</option>
-            </select>
+              onChange={val => setType(val)}
+              options={typeOptions}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">资金分类</label>
-            <select 
+            <CustomSelect 
               value={fundType} 
-              onChange={e => setFundType(e.target.value as any)}
-              className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-            >
-              <option value="working">流动资金 (现金/微信/支付宝/储蓄卡等)</option>
-              <option value="investment">投资资金 (股票/基金/理财等)</option>
-              <option value="unavailable">不可用资金 (定期/冻结/公积金等)</option>
-            </select>
+              onChange={val => setFundType(val)}
+              options={fundTypeOptions}
+            />
           </div>
 
           <div>

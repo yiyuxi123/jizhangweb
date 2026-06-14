@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Plus, Trash2 } from '../utils/icons';
 import { useStore } from '../store/useStore';
+import CustomSelect from './CustomSelect';
 
 export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
   const { budgets, updateBudget, addBudget, deleteBudget, categories } = useStore();
@@ -14,6 +15,13 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
   );
 
   const expenseCategories = categories.filter(c => c.type === 'expense' && !c.excludeFromBudget);
+
+  const categoryOptions = React.useMemo(() => {
+    return expenseCategories.map(c => ({
+      value: c.id,
+      label: c.name
+    }));
+  }, [expenseCategories]);
 
   const handleAddCategoryBudget = () => {
     if (expenseCategories.length > 0) {
@@ -117,15 +125,13 @@ export default function EditBudgetModal({ onClose }: { onClose: () => void }) {
               <div className="space-y-3">
                 {catBudgets.map((cb, index) => (
                   <div key={index} className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-900 p-2 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <select
+                    <CustomSelect
                       value={cb.categoryId}
-                      onChange={(e) => handleCategoryBudgetChange(index, 'categoryId', e.target.value)}
-                      className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none"
-                    >
-                      {expenseCategories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                      onChange={val => handleCategoryBudgetChange(index, 'categoryId', val)}
+                      options={categoryOptions}
+                      className="flex-1 min-w-0"
+                      triggerClassName="w-full px-2 py-1.5 bg-transparent border-none text-sm font-medium text-gray-700 dark:text-gray-200 outline-none flex justify-between items-center text-left cursor-pointer"
+                    />
                     <div className="flex items-center bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700">
                       <span className="text-gray-500 dark:text-gray-400 mr-1 text-sm">¥</span>
                       <input
