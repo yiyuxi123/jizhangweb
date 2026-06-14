@@ -394,8 +394,8 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 onClick={() => setType(t)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   type === t 
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-250'
                 }`}
               >
                 {t === 'expense' ? '支出' : t === 'income' ? '收入' : '转账'}
@@ -408,7 +408,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
               const aiEl = document.getElementById('ai-bookkeeper-section');
               aiEl?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-full animate-bounce"
+            className="p-2 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-full animate-bounce"
             title="AI 智能记账"
           >
             <Icons.Mic size={24} />
@@ -416,7 +416,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
         </div>
 
         {/* Quick Add Templates Row */}
-        <div className="px-6 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 flex items-center space-x-2 overflow-x-auto shrink-0 snap-x">
+        <div className="px-6 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 flex items-center space-x-2 overflow-x-auto shrink-0 snap-x">
           <span className="text-[10px] font-extrabold text-gray-400 dark:text-gray-500 shrink-0 mr-1 flex items-center">
             <Icons.Zap size={12} className="text-yellow-500 mr-0.5" /> 快捷模板:
           </span>
@@ -627,7 +627,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                       >
                         <IconComponent size={24} />
                       </div>
-                      <span className={`text-xs font-medium ${isSelected ? 'text-gray-900' : 'text-gray-500'}`}>
+                      <span className={`text-xs font-medium ${isSelected ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                         {cat.name}
                       </span>
                     </button>
@@ -747,7 +747,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                 onChange={(e) => setIsReimbursable(e.target.checked)}
                 className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
               />
-              <label htmlFor="reimbursable" className="text-sm font-medium text-gray-700">
+              <label htmlFor="reimbursable" className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 可报销
               </label>
             </div>
@@ -757,7 +757,7 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
           {type === 'income' && selectedCategory?.name === '报销款' && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700">选择要报销的记录</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">选择要报销的记录</label>
                 {transactions.filter(t => t.type === 'expense' && t.isReimbursable && (!t.isReimbursed || t.reimbursedByTxId === initialTransaction?.id)).length > 0 && (
                   <button
                     type="button"
@@ -775,14 +775,14 @@ export default function AddTransactionModal({ isOpen, onClose, initialTransactio
                   </button>
                 )}
               </div>
-              <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-100 dark:border-gray-700 rounded-xl p-2 bg-gray-50">
+              <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-100 dark:border-gray-700 rounded-xl p-2 bg-gray-50 dark:bg-gray-900">
                 {transactions.filter(t => t.type === 'expense' && t.isReimbursable && (!t.isReimbursed || t.reimbursedByTxId === initialTransaction?.id)).length === 0 ? (
                   <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center py-2">没有待报销的记录</p>
                 ) : (
                   transactions
                     .filter(t => t.type === 'expense' && t.isReimbursable && (!t.isReimbursed || t.reimbursedByTxId === initialTransaction?.id))
                     .map(t => (
-                      <div key={t.id} className="flex items-center space-x-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-100">
+                      <div key={t.id} className="flex items-center space-x-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
                         <input
                           type="checkbox"
                           checked={selectedReimbursableIds.includes(t.id)}

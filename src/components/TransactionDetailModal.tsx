@@ -63,7 +63,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
 
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">账单详情</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">账单详情</h2>
             <div className="flex items-center space-x-2">
               <button 
                 onClick={() => {
@@ -80,7 +80,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
                   });
                   alert('已保存为快捷记账模板');
                 }} 
-                className="p-2 text-gray-400 dark:text-gray-500 hover:text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors" 
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-emerald-600 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors" 
                 title="保存为模板"
               >
                 <Icons.BookmarkPlus size={20} />
@@ -121,7 +121,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
             </h3>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl p-5 space-y-4 mb-8 border border-gray-100">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 space-y-4 mb-8 border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2 text-gray-500">
                 <Calendar size={18} />
@@ -161,7 +161,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
             )}
 
             {transaction.note && (
-              <div className="pt-3 mt-3 border-t border-gray-200/60">
+              <div className="pt-3 mt-3 border-t border-gray-200/60 dark:border-gray-700/60">
                 <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
                   <AlignLeft size={18} />
                   <span className="text-sm">备注</span>
@@ -173,7 +173,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
             )}
 
             {transaction.image && (
-              <div className="pt-3 mt-3 border-t border-gray-200/60">
+              <div className="pt-3 mt-3 border-t border-gray-200/60 dark:border-gray-700/60">
                 <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
                   <Icons.Image size={18} />
                   <span className="text-sm">关联单据/凭证图片</span>
@@ -190,7 +190,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
             )}
 
             {transaction.tags && transaction.tags.length > 0 && (
-              <div className="pt-3 mt-3 border-t border-gray-200/60">
+              <div className="pt-3 mt-3 border-t border-gray-200/60 dark:border-gray-700/60">
                 <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">
                   <Tag size={18} />
                   <span className="text-sm">标签</span>
@@ -219,11 +219,11 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
               {showHistory && (
                 <div className="space-y-3">
                   {transaction.history.map((h, i) => (
-                    <div key={i} className="bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 p-3 rounded-lg text-xs border border-gray-100">
+                    <div key={i} className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg text-xs border border-gray-100 dark:border-gray-700">
                       <div className="text-gray-400 dark:text-gray-500 mb-1">{format(parseISO(h.date), 'yyyy-MM-dd HH:mm')}</div>
                       {h.changes.map((c, j) => (
-                        <div key={j} className="text-gray-600">
-                          <span className="font-medium text-gray-700">{fieldNameMap[c.field] || c.field}: </span>
+                        <div key={j} className="text-gray-600 dark:text-gray-300">
+                          <span className="font-medium text-gray-700 dark:text-gray-200">{fieldNameMap[c.field] || c.field}: </span>
                           <span className="line-through text-gray-400 dark:text-gray-500 mr-1">{formatValue(c.field, c.oldValue)}</span>
                           <ArrowRight size={10} className="inline mx-1" />
                           <span className="text-emerald-600">{formatValue(c.field, c.newValue)}</span>
@@ -251,7 +251,7 @@ export default function TransactionDetailModal({ transaction, onClose }: { trans
           ) : (
             <button 
               onClick={() => setShowConfirm(true)}
-              className="w-full py-4 bg-white dark:bg-gray-800 border-2 border-red-100 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-colors flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-950/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold rounded-xl transition-colors flex items-center justify-center space-x-2"
             >
               <Trash2 size={20} />
               <span>删除记录</span>

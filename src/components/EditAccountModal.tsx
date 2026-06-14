@@ -67,8 +67,8 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
       <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">编辑账户</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">编辑账户</h2>
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50">
             <X size={24} />
           </button>
         </div>
@@ -127,9 +127,9 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700">
             <div>
-              <h4 className="font-medium text-gray-900">折叠账户</h4>
+              <h4 className="font-medium text-gray-900 dark:text-gray-100">折叠账户</h4>
               <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">在资产列表中折叠显示此账户</p>
             </div>
             <button
@@ -142,8 +142,8 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
           </div>
 
           {type === 'auto_deposit' && (
-            <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
-              <h4 className="font-medium text-gray-900">自动入账设置</h4>
+            <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100">自动入账设置</h4>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">每月入账金额</label>
                 <input 
@@ -180,7 +180,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
             </button>
 
             {showConfirm ? (
-              <div className="space-y-3 pt-4 border-t border-gray-100">
+              <div className="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <p className="text-center text-red-500 font-medium text-sm">删除账户将无法恢复，确定删除吗？</p>
                 <div className="flex space-x-3">
                   <button type="button" onClick={() => setShowConfirm(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">
@@ -195,7 +195,7 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
               <button 
                 type="button"
                 onClick={() => setShowConfirm(true)}
-                className="w-full py-4 bg-red-50 text-red-500 hover:bg-red-100 font-bold rounded-xl transition-colors flex items-center justify-center space-x-2"
+                className="w-full py-4 bg-red-50 dark:bg-red-950/20 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 font-bold rounded-xl transition-colors flex items-center justify-center space-x-2"
               >
                 <Trash2 size={20} />
                 <span>删除账户</span>

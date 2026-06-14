@@ -46,7 +46,7 @@ export default function DonationModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-gray-100">
+          <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
             <button 
               onClick={onClose}
               className="w-full py-3 bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 text-gray-700 dark:text-gray-200 font-medium rounded-xl transition-colors"

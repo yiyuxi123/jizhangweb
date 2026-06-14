@@ -47,8 +47,8 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm transition-opacity">
       <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-300 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">添加账户</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">添加账户</h2>
+          <button onClick={onClose} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50">
             <X size={24} />
           </button>
         </div>
@@ -108,8 +108,8 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
           </div>
 
           {type === 'auto_deposit' && (
-            <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 rounded-2xl border border-gray-100">
-              <h4 className="font-medium text-gray-900">自动入账设置</h4>
+            <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100">自动入账设置</h4>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">每月入账金额</label>
                 <input 
