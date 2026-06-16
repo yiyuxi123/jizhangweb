@@ -339,3 +339,83 @@ ${transactions.slice(0, 10).map(t => {
     return '抱歉，我现在无法连接到 AI 助手。请检查您的网络连接或稍后再试。';
   }
 }
+
+/**
+ * 4. AI Rebalancing Advisor via DeepSeek
+ */
+export async function getRebalanceAdvice(
+  currentBalances: { name: string; balance: number; currentRatio: number; targetRatio: number; deviation: number }[],
+  strategy: 'dynamic' | 'periodic' | 'threshold',
+  strategyParams: { newFunds?: number; thresholdValue?: number; actions?: { name: string; action: string; amount: number }[] }
+): Promise<string> {
+  const strategyLabel = {
+    dynamic: '动态再平衡 (增量注入)',
+    periodic: '定期再平衡 (一键配平)',
+    threshold: '阈值再平衡 (纪律监控)'
+  }[strategy];
+
+  let strategyDetails = '';
+  if (strategy === 'dynamic') {
+    strategyDetails = `准备追加的增量资金: ¥${strategyParams.newFunds || 0}\n系统算出的分配指南: \n` + 
+      (strategyParams.actions || []).map(a => `- 为 [${a.name}] 分配新钱: ¥${a.amount}`).join('\n');
+  } else if (strategy === 'periodic') {
+    strategyDetails = `系统算出的存量配平方案: \n` + 
+      (strategyParams.actions || []).map(a => {
+        if (a.action === 'buy') return `- 【买入】[${a.name}] 金额: ¥${a.amount}`;
+        if (a.action === 'sell') return `- 【卖出】[${a.name}] 金额: ¥${a.amount}`;
+        return `- [${a.name}] 保持现状`;
+      }).join('\n');
+  } else if (strategy === 'threshold') {
+    strategyDetails = `设定的偏离度报警阈值: ${strategyParams.thresholdValue || 5}%\n当前超出或接近该阈值的理财账户情况见持仓列表。`;
+  }
+
+  const listStr = currentBalances.map(b => 
+    `- 账户 [${b.name}]: 当前余额 ¥${b.balance.toFixed(2)} | 实际占比 ${b.currentRatio}% | 目标占比 ${b.targetRatio}% | 绝对偏离度 ${b.deviation > 0 ? '+' : ''}${b.deviation}%`
+  ).join('\n');
+
+  const systemInstructions = `你是一个纪律严明的量化投资顾问。你的核心投资心法是“反人性”的资产再平衡（高抛低吸、遵守规则、冷冰冰且逻辑清晰）。
+请根据用户提供的投资占比数据和所选择的调仓方案，生成一份情绪稳定、逻辑严密、专业度极高的调仓分析报告。
+
+【用户当前理财账户持仓详情】
+${listStr}
+
+【选择的调仓方案】
+方案名称：${strategyLabel}
+操作详情：
+${strategyDetails}
+
+【你的职责】
+1. 当前偏离情况分析：深度诊断当前的账户偏差（哪些资产因超额收益而过热，需要卖出获利了结；哪些资产因回调而跌入估值底部，具有中长期定投价值）。
+2. 调仓方案解释：用通俗但专业的语言，帮助用户理清这套调仓方案背后的算路逻辑（例如动态平衡为什么能做到“用新资金直接填谷，减少摩擦成本”）。
+3. 纪律性心理辅导：解释为什么要在市场波动时做到“反人性”（克服恐惧买入低位，克服贪婪卖出高位），阐明严格的资产再平衡规则对于分散组合风险、控制最大回撤和锁定收益的战略级优势。
+4. 语言风格：专业、沉稳、严谨，像一个情绪极其稳定的算法交易总监。不要有鸡汤，只谈资产相关性、波动率回归与交易纪律。请直接输出 Markdown 内容。`;
+
+  try {
+    const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getDeepSeekKey()}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemInstructions },
+          { role: 'user', content: '请根据我的财务数据，为我生成一份详细的资产再平衡调仓建议报告。' }
+        ],
+        temperature: 0.3
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content.trim() as string;
+  } catch (error) {
+    console.error('Failed to get rebalance advice via DeepSeek:', error);
+    return '抱歉，我现在无法连接到 AI 助手。请检查您的网络连接并确保您已在“设置”中配置了有效的 DeepSeek API Key。';
+  }
+}
+

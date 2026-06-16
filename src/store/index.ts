@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { get, set as idbSet, del } from 'idb-keyval';
-import { Account, Budget, Category, Transaction, TransactionTemplate, SavingGoal, SyncSettings } from '../types';
+import { Account, Budget, Category, Transaction, TransactionTemplate, SavingGoal, SyncSettings, RebalanceConfig } from '../types';
 
 // Custom storage for IndexedDB
 const storage = {
@@ -84,6 +84,8 @@ export interface AppState {
   qwenApiKey: string;
   setDeepseekApiKey: (key: string) => void;
   setQwenApiKey: (key: string) => void;
+  rebalanceConfig: RebalanceConfig;
+  setRebalanceConfig: (config: Partial<RebalanceConfig>) => void;
   recalculateBalances: (skipUpload?: boolean) => void;
 
   // Actions
@@ -160,6 +162,13 @@ export const useStore = create<AppState>()(
         tombstones: {},
         deepseekApiKey: '',
         qwenApiKey: '',
+        rebalanceConfig: {
+          strategy: 'dynamic',
+          thresholdValue: 5,
+        },
+        setRebalanceConfig: (config) => set((state) => ({
+          rebalanceConfig: { ...state.rebalanceConfig, ...config }
+        })),
 
         // ─── Simple setters ─────────────────────────────────────
         ...createSimpleSetters(set),
@@ -215,6 +224,7 @@ export const useStore = create<AppState>()(
         qwenApiKey: state.qwenApiKey,
         dismissedAlertTypes: state.dismissedAlertTypes,
         theme: state.theme,
+        rebalanceConfig: state.rebalanceConfig,
       }),
     }
   )

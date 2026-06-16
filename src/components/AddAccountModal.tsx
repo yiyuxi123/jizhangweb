@@ -26,6 +26,7 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
   const [autoDepositAmount, setAutoDepositAmount] = useState('');
   const [autoDepositDay, setAutoDepositDay] = useState('');
   const [fundType, setFundType] = useState<'working' | 'investment' | 'unavailable'>('working');
+  const [targetRatio, setTargetRatio] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +55,8 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
       icon,
       autoDepositAmount: type === 'auto_deposit' && autoDepositAmount ? Number(autoDepositAmount) : undefined,
       autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined,
-      fundType
+      fundType,
+      targetRatio: fundType === 'investment' && targetRatio ? Math.round(Number(targetRatio)) : undefined
     });
     onClose();
   };
@@ -99,6 +101,22 @@ export default function AddAccountModal({ onClose }: { onClose: () => void }) {
               options={fundTypeOptions}
             />
           </div>
+ 
+           {fundType === 'investment' && (
+             <div>
+               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">目标仓位比例 (%)</label>
+               <input 
+                 type="number" 
+                 min="0"
+                 max="100"
+                 step="1"
+                 value={targetRatio}
+                 onChange={e => setTargetRatio(e.target.value)}
+                 placeholder="例如：30 (账户目标在投资总盘子中的比重)"
+                 className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+               />
+             </div>
+           )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">初始余额</label>

@@ -26,7 +26,14 @@ export interface Account {
   autoDepositDay?: number;
   order?: number;
   fundType?: 'working' | 'investment' | 'unavailable';
+  targetRatio?: number; // Target ratio in % for investment rebalancing
   updatedAt?: number; // Last modification timestamp
+}
+
+export interface RebalanceConfig {
+  strategy: 'dynamic' | 'periodic' | 'threshold';
+  thresholdValue: number; // Deviation threshold, default is 5%
+  periodicDate?: string; // Optional target date
 }
 
 export interface SyncSettings {

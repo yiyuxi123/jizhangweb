@@ -15,6 +15,7 @@ import SettingsModal from '../components/SettingsModal';
 import DonationModal from '../components/DonationModal';
 import GuideModal from '../components/GuideModal';
 import { Account, SavingGoal } from '../types';
+import RebalanceDashboard from '../components/RebalanceDashboard';
 import { format, parseISO } from 'date-fns';
 import { auth } from '../firebase';
 import {
@@ -185,6 +186,7 @@ export default function Accounts() {
   const [isDonationOpen, setIsDonationOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isManageTemplatesOpen, setIsManageTemplatesOpen] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState<'accounts' | 'rebalance'>('accounts');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -473,8 +475,36 @@ export default function Accounts() {
         </div>
       </div>
 
-      {/* Accounts List */}
-      <div className="space-y-4">
+      {/* Segmented Control Tab */}
+      <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('accounts')}
+          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            activeSubTab === 'accounts'
+              ? 'bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+          }`}
+        >
+          资金账户
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('rebalance')}
+          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            activeSubTab === 'rebalance'
+              ? 'bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+          }`}
+        >
+          资产再平衡
+        </button>
+      </div>
+
+      {activeSubTab === 'accounts' ? (
+        <>
+          {/* Accounts List */}
+          <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">我的账户</h3>
           <button 
@@ -613,6 +643,10 @@ export default function Accounts() {
           </div>
         )}
       </div>
+        </>
+      ) : (
+        <RebalanceDashboard />
+      )}
 
       {/* Data Management */}
       <div className="space-y-4 pt-4">
