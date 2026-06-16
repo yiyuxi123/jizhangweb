@@ -7,6 +7,26 @@ export const roundMoney = (val: number): number => {
   return Math.round(val * 100) / 100;
 };
 
+/**
+ * Automatically extracts a clean, shortened name (abbreviation) for accounts
+ * to prevent legend overflow in pie charts.
+ */
+export const getAccountShortName = (name: string): string => {
+  if (!name) return '';
+  let short = name;
+  // Remove common suffixes and descriptors
+  short = short.replace(/(开放式|发起式|定期开放|定开|混合型|股票型|指数增强|指数型|指数|债券型|证券投资|投资|联接|证券投资基金|基金|账户|LOF|ETF|A类|C类|I类|E类)/g, '');
+  // Remove parentheses content
+  short = short.replace(/\(.*?\)/g, '').replace(/（.*?）/g, '');
+  // Trim space
+  short = short.trim();
+  // Limit length to 8 characters to fit nicely in legends
+  if (short.length > 8) {
+    short = short.substring(0, 8) + '...';
+  }
+  return short;
+};
+
 const getSumOfValues = (obj: Record<string, number>): number => {
   return Object.values(obj).reduce((sum, val) => sum + val, 0);
 };

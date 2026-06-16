@@ -7,7 +7,8 @@ import {
   calculateDynamicInjection,
   calculatePeriodicRebalance,
   checkThresholdDeviation,
-  roundMoney
+  roundMoney,
+  getAccountShortName
 } from '../utils/rebalanceUtils';
 import { getRebalanceAdvice } from '../services/aiService';
 
@@ -177,7 +178,7 @@ export default function RebalanceDashboard() {
       return [{ name: '无资金', value: 1, color: '#94a3b8' }];
     }
     return investmentAccounts.map(a => ({
-      name: a.name,
+      name: getAccountShortName(a.name),
       value: a.balance > 0 ? a.balance : 0,
       color: a.color
     }));
@@ -188,7 +189,7 @@ export default function RebalanceDashboard() {
       return [{ name: '未设定占比', value: 1, color: '#94a3b8' }];
     }
     return investmentAccounts.map(a => ({
-      name: a.name,
+      name: getAccountShortName(a.name),
       value: a.targetRatio || 0,
       color: a.color
     })).filter(item => item.value > 0);
@@ -338,6 +339,18 @@ export default function RebalanceDashboard() {
                 </div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">目标配置</p>
               </div>
+            </div>
+
+            {/* Unified Color Legend */}
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-3.5 border-t border-gray-50 dark:border-gray-700/50 mt-2">
+              {investmentAccounts.map(a => (
+                <div key={a.id} className="flex items-center space-x-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: a.color }} />
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-semibold">
+                    {getAccountShortName(a.name)}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
