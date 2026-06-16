@@ -27,6 +27,7 @@ export interface Account {
   order?: number;
   fundType?: 'working' | 'investment' | 'unavailable';
   targetRatio?: number; // Target ratio in % for investment rebalancing
+  shortName?: string; // AI-extracted short name for legends
   updatedAt?: number; // Last modification timestamp
 }
 

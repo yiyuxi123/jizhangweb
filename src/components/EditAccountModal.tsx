@@ -62,6 +62,8 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
     if (type === 'bank') { icon = 'Landmark'; color = '#ef4444'; }
     if (type === 'auto_deposit') { icon = 'PiggyBank'; color = '#8b5cf6'; }
 
+    const nameChanged = name !== account.name;
+
     updateAccount(account.id, {
       name,
       type,
@@ -72,7 +74,8 @@ export default function EditAccountModal({ account, onClose }: { account: Accoun
       autoDepositAmount: type === 'auto_deposit' && autoDepositAmount ? Number(autoDepositAmount) : undefined,
       autoDepositDay: type === 'auto_deposit' && autoDepositDay ? Number(autoDepositDay) : undefined,
       fundType,
-      targetRatio: fundType === 'investment' && targetRatio ? Math.round(Number(targetRatio)) : undefined
+      targetRatio: fundType === 'investment' && targetRatio ? Math.round(Number(targetRatio)) : undefined,
+      shortName: nameChanged ? undefined : account.shortName
     });
     onClose();
   };

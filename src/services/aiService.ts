@@ -344,7 +344,7 @@ ${transactions.slice(0, 10).map(t => {
  * 4. AI Rebalancing Advisor via DeepSeek
  */
 export async function getRebalanceAdvice(
-  currentBalances: { name: string; balance: number; currentRatio: number; targetRatio: number; deviation: number }[],
+  currentBalances: { name: string; shortName?: string; balance: number; currentRatio: number; targetRatio: number; deviation: number }[],
   strategy: 'dynamic' | 'periodic' | 'threshold',
   strategyParams: { newFunds?: number; thresholdValue?: number; actions?: { name: string; action: string; amount: number }[] }
 ): Promise<string> {
@@ -370,16 +370,19 @@ export async function getRebalanceAdvice(
   }
 
   const listStr = currentBalances.map(b => 
-    `- 账户 [${b.name}]: 当前余额 ¥${b.balance.toFixed(2)} | 实际占比 ${b.currentRatio}% | 目标占比 ${b.targetRatio}% | 绝对偏离度 ${b.deviation > 0 ? '+' : ''}${b.deviation}%`
+    `- 账户 [${b.shortName || b.name}]: 当前余额 ¥${b.balance.toFixed(2)} | 实际占比 ${b.currentRatio}% | 目标占比 ${b.targetRatio}% | 绝对偏离度 ${b.deviation > 0 ? '+' : ''}${b.deviation}%`
   ).join('\n');
 
   const systemInstructions = `你是一个纪律严明的量化投资顾问。你的核心投资心法是“反人性”的资产再平衡（高抛低吸、遵守规则、冷冰冰且逻辑清晰）。
 请根据用户提供的投资占比数据和所选择的调仓方案，生成一份情绪稳定、逻辑严密、极其精炼的调仓分析报告。
+整篇报告【必须严格控制在 200 字以内】。`;
 
-【当前参考时间】
-${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}
+  const currentTimeStr = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
 
-【用户当前理财账户持仓详情】
+  const userPrompt = `【当前参考时间】
+${currentTimeStr}
+
+【我的当前理财账户持仓详情】
 ${listStr}
 
 【选择的调仓方案】
@@ -387,11 +390,12 @@ ${listStr}
 操作详情：
 ${strategyDetails}
 
-【你的职责】
-1. 当前偏离情况分析：以极其简炼的语言诊断当前的账户偏差（不超过2句话，指出偏离最严重的资产）。
-2. 调仓方案解释与执行：用极简短的 Markdown 列表直接给出核心动作建议，帮助用户理清这套调仓方案背后的算路逻辑，避免长篇大论。
-3. 纪律性心理辅导：简单阐述为什么在市场波动时做到“反人性”（克服恐惧买入低位，克服贪婪卖出高位）是长期盈利的关键。
-4. 总体篇幅控制：整篇报告【必须控制在 300 字以内】，重点突出，直接给出行动建议和原因，绝不包含任何套话或多余的解释。请直接输出 Markdown 内容。`;
+【输出要求（极其重要，必须严格执行）】
+1. 报告第一行必须直接输出分析时间，格式为：“分析时间：${currentTimeStr}”，绝对不允许输出任何其他历史日期（如2023年10月17号等）。
+2. 当前偏离情况分析：用 1-2 句话直接点明偏离最严重的资产（如：“当前[资产A]超配严重，[资产B]配置不足”）。
+3. 调仓行动建议：以简短的 Markdown 无序列表列出核心动作，直接说明该买入多少、卖出多少或注入多少，重点突出，绝不啰嗦。
+4. 纪律性提示：用 1 句话阐述坚持调仓纪律、克服人性的重要性。
+5. 篇幅与风格：整篇报告必须在 200 字以内，去粗取精，直击重点，没有废话和套话。请直接输出 Markdown。`;
 
   try {
     const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
@@ -404,7 +408,7 @@ ${strategyDetails}
         model: 'deepseek-chat',
         messages: [
           { role: 'system', content: systemInstructions },
-          { role: 'user', content: '请根据我的财务数据，为我生成一份详细的资产再平衡调仓建议报告。' }
+          { role: 'user', content: userPrompt }
         ],
         temperature: 0.3
       })
@@ -419,6 +423,68 @@ ${strategyDetails}
   } catch (error) {
     console.error('Failed to get rebalance advice via DeepSeek:', error);
     return '抱歉，我现在无法连接到 AI 助手。请检查您的网络连接并确保您已在“设置”中配置了有效的 DeepSeek API Key。';
+  }
+}
+
+/**
+ * Call DeepSeek to extract short names for accounts to fit nicely in legends.
+ */
+export async function extractAccountShortNames(
+  names: string[]
+): Promise<Record<string, string>> {
+  if (names.length === 0) return {};
+
+  const systemInstructions = `你是一个专业的金融资产与投资账户名称缩写专家。
+请将用户提供的理财产品、基金、银行卡等账户的完整名称，提炼为最合适、最简洁的图例简称。
+
+【缩写规则】
+1. 长度控制：简称字数【必须在 2 到 6 个字之内】，不要超出。
+2. 语义完整：去掉无关的修饰词（如“开放式”、“发起式”、“定期开放”、“定开”、“混合型”、“股票型”、“债券型”、“证券投资基金”、“基金”、“账户”、“LOF”、“ETF”、“A类”、“C类”等）。
+3. 品牌+核心特色：保留品牌简称（如“易方达”、“招商银行”->“招行”、“腾讯”->“微信”、“阿里巴巴”->“支付宝”）和核心资产特征（如“消费”、“沪深300”、“白酒”、“创新成长”）。
+4. 示例：
+   - "易方达消费行业股票型证券投资基金" -> "易方达消费"
+   - "招商银行双债增强债券型证券投资基金A" -> "招商双债A"
+   - "微信支付零钱通活期理财" -> "零钱通"
+   - "支付宝余额宝余额活期" -> "余额宝"
+   - "工银瑞信前沿医疗股票A" -> "工银前沿医疗"
+   - "招商银行朝朝盈理财" -> "招商朝朝盈"
+
+请直接返回一个标准的 JSON 对象，格式为：
+{
+  "原始完整名称1": "简称1",
+  "原始完整名称2": "简称2"
+}
+⚠️ 绝对不要包含任何 Markdown 标记（如 \`\`\`json），不要有任何前导或后随的文字，只能返回一个纯净、可以直接被 JSON.parse 解析的字符串。`;
+
+  try {
+    const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getDeepSeekKey()}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemInstructions },
+          { role: 'user', content: `请缩写以下账户名称列表：\n${JSON.stringify(names)}` }
+        ],
+        temperature: 0.1
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content.trim();
+    // Clean up code block syntax if returned by the LLM
+    const cleanContent = content.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+    return JSON.parse(cleanContent) as Record<string, string>;
+  } catch (error) {
+    console.error('Failed to extract account short names:', error);
+    return {};
   }
 }
 

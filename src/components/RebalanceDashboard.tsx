@@ -10,7 +10,20 @@ import {
   roundMoney,
   getAccountShortName
 } from '../utils/rebalanceUtils';
-import { getRebalanceAdvice } from '../services/aiService';
+import { getRebalanceAdvice, extractAccountShortNames } from '../services/aiService';
+
+const PRESET_COLORS = [
+  '#3b82f6', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#8b5cf6', // purple
+  '#ef4444', // red
+  '#06b6d4', // cyan
+  '#ec4899', // pink
+  '#14b8a6', // teal
+  '#f43f5e', // rose
+  '#a855f7'  // violet
+];
 
 // Simple markdown formatter helper to display bold text and list items cleanly
 const renderFormattedText = (text: string) => {
@@ -84,6 +97,37 @@ export default function RebalanceDashboard() {
     return accounts.filter(a => a.fundType === 'investment' && !a.isHidden);
   }, [accounts]);
 
+  // Trigger AI short name extraction for investment accounts that don't have a shortName set
+  React.useEffect(() => {
+    const hasKey = useStore.getState().deepseekApiKey?.trim() || import.meta.env.VITE_DEEPSEEK_API_KEY?.trim();
+    if (!hasKey) return;
+
+    const accountsNeedingShortName = investmentAccounts.filter(a => !a.shortName);
+    if (accountsNeedingShortName.length === 0) return;
+
+    const names = accountsNeedingShortName.map(a => a.name);
+    
+    const fetchShortNames = async () => {
+      try {
+        const shortNamesMap = await extractAccountShortNames(names);
+        Object.entries(shortNamesMap).forEach(([fullName, shortName]) => {
+          const acc = accountsNeedingShortName.find(a => a.name === fullName);
+          if (acc && shortName && typeof shortName === 'string') {
+            updateAccount(acc.id, { shortName: shortName.trim() });
+          }
+        });
+      } catch (err) {
+        console.error('Failed to auto-extract short names:', err);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      fetchShortNames();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [investmentAccounts, updateAccount]);
+
   // 2. Sum up balances
   const totalInvestment = useMemo(() => {
     return investmentAccounts.reduce((sum, a) => sum + (a.balance > 0 ? a.balance : 0), 0);
@@ -131,6 +175,7 @@ export default function RebalanceDashboard() {
         return {
           id,
           name: acc?.name || '未知账户',
+          shortName: acc ? (acc.shortName || getAccountShortName(acc.name)) : '未知账户',
           amount
         };
       }).filter(item => item.amount > 0);
@@ -154,10 +199,12 @@ export default function RebalanceDashboard() {
       const actions = calculatePeriodicRebalance(currentBalancesMap, targetRatiosMap);
       return actions.map(act => {
         const acc = investmentAccounts.find(a => a.id === act.accountId);
+        const idx = investmentAccounts.findIndex(a => a.id === act.accountId);
         return {
           ...act,
           name: acc?.name || '未知账户',
-          color: acc?.color || '#cbd5e1'
+          shortName: acc ? (acc.shortName || getAccountShortName(acc.name)) : '未知账户',
+          color: idx !== -1 ? PRESET_COLORS[idx % PRESET_COLORS.length] : '#cbd5e1'
         };
       }).filter(a => a.action !== 'hold');
     } catch (e) {
@@ -177,10 +224,10 @@ export default function RebalanceDashboard() {
     if (totalInvestment === 0) {
       return [{ name: '无资金', value: 1, color: '#94a3b8' }];
     }
-    return investmentAccounts.map(a => ({
-      name: getAccountShortName(a.name),
+    return investmentAccounts.map((a, idx) => ({
+      name: a.shortName || getAccountShortName(a.name),
       value: a.balance > 0 ? a.balance : 0,
-      color: a.color
+      color: PRESET_COLORS[idx % PRESET_COLORS.length]
     }));
   }, [investmentAccounts, totalInvestment]);
 
@@ -188,10 +235,10 @@ export default function RebalanceDashboard() {
     if (sumTargetRatios === 0) {
       return [{ name: '未设定占比', value: 1, color: '#94a3b8' }];
     }
-    return investmentAccounts.map(a => ({
-      name: getAccountShortName(a.name),
+    return investmentAccounts.map((a, idx) => ({
+      name: a.shortName || getAccountShortName(a.name),
       value: a.targetRatio || 0,
-      color: a.color
+      color: PRESET_COLORS[idx % PRESET_COLORS.length]
     })).filter(item => item.value > 0);
   }, [investmentAccounts, sumTargetRatios]);
 
@@ -208,6 +255,7 @@ export default function RebalanceDashboard() {
         const devDetail = deviations.find(d => d.accountId === a.id);
         return {
           name: a.name,
+          shortName: a.shortName || getAccountShortName(a.name),
           balance: a.balance > 0 ? a.balance : 0,
           currentRatio: devDetail?.currentRatio || 0,
           targetRatio: a.targetRatio || 0,
@@ -218,14 +266,17 @@ export default function RebalanceDashboard() {
       let strategyParams: any = {};
       if (rebalanceConfig.strategy === 'dynamic') {
         strategyParams.newFunds = Number(newFunds) || 0;
-        strategyParams.actions = (injectionPlan || []).map(p => ({
-          name: p.name,
-          action: 'buy',
-          amount: p.amount
-        }));
+        strategyParams.actions = (injectionPlan || []).map(p => {
+          const acc = investmentAccounts.find(a => a.name === p.name);
+          return {
+            name: acc ? (acc.shortName || getAccountShortName(acc.name)) : p.name,
+            action: 'buy',
+            amount: p.amount
+          };
+        });
       } else if (rebalanceConfig.strategy === 'periodic') {
         strategyParams.actions = (periodicPlan || []).map(p => ({
-          name: p.name,
+          name: p.shortName || p.name,
           action: p.action,
           amount: p.amount
         }));
@@ -343,11 +394,11 @@ export default function RebalanceDashboard() {
 
             {/* Unified Color Legend */}
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-3.5 border-t border-gray-50 dark:border-gray-700/50 mt-2">
-              {investmentAccounts.map(a => (
+              {investmentAccounts.map((a, idx) => (
                 <div key={a.id} className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: a.color }} />
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PRESET_COLORS[idx % PRESET_COLORS.length] }} />
                   <span className="text-[10px] text-gray-500 dark:text-gray-400 font-semibold">
-                    {getAccountShortName(a.name)}
+                    {a.shortName || getAccountShortName(a.name)}
                   </span>
                 </div>
               ))}
@@ -364,18 +415,19 @@ export default function RebalanceDashboard() {
             </h3>
             
             <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
-              {investmentAccounts.map(account => {
+              {investmentAccounts.map((account, idx) => {
                 const devDetail = deviations.find(d => d.accountId === account.id);
                 const currentRatio = devDetail?.currentRatio || 0;
                 const targetRatio = account.targetRatio || 0;
                 const deviation = devDetail?.deviation || 0;
 
                 const isDeviated = Math.abs(deviation) >= rebalanceConfig.thresholdValue;
+                const displayColor = PRESET_COLORS[idx % PRESET_COLORS.length];
 
                 return (
                   <div key={account.id} className="py-3.5 flex items-center justify-between">
                     <div className="flex items-center space-x-3 min-w-0 pr-2">
-                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: account.color }} />
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: displayColor }} />
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{account.name}</p>
                         <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
@@ -484,7 +536,7 @@ export default function RebalanceDashboard() {
                     <ul className="space-y-1.5">
                       {injectionPlan.map(item => (
                         <li key={item.id} className="text-xs text-gray-600 dark:text-gray-300 flex justify-between">
-                          <span>将资金注入到：**{item.name}**</span>
+                          <span>将资金注入到：**{item.shortName}**</span>
                           <span className="font-bold text-gray-800 dark:text-gray-100">¥{item.amount.toFixed(2)}</span>
                         </li>
                       ))}
@@ -514,7 +566,7 @@ export default function RebalanceDashboard() {
                           <li key={item.accountId} className="text-xs flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-800 last:border-0">
                             <span className="flex items-center space-x-1.5">
                               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                              <span>{item.name}</span>
+                              <span>{item.shortName}</span>
                             </span>
                             <span className="font-bold">
                               {item.action === 'sell' ? (
