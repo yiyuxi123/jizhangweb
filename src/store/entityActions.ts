@@ -48,14 +48,27 @@ export function createTransactionActions(set: SetFn, get: GetFn) {
         if (toAcc) toAcc.balance += newTx.amount;
       }
 
-      set((state: any) => ({
-        transactions: [newTx, ...state.transactions].sort((a: any, b: any) => {
-          const timeA = a.date ? new Date(a.date).getTime() : 0;
-          const timeB = b.date ? new Date(b.date).getTime() : 0;
-          return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
-        }),
-        accounts,
-      }));
+      set((state: any) => {
+        let updatedTransactions = [newTx, ...state.transactions];
+
+        if (newTx.reimbursedTxIds && newTx.reimbursedTxIds.length > 0) {
+          updatedTransactions = updatedTransactions.map((t: any) => {
+            if (newTx.reimbursedTxIds.includes(t.id)) {
+              return { ...t, isReimbursed: true, reimbursedByTxId: newTx.id };
+            }
+            return t;
+          });
+        }
+
+        return {
+          transactions: updatedTransactions.sort((a: any, b: any) => {
+            const timeA = a.date ? new Date(a.date).getTime() : 0;
+            const timeB = b.date ? new Date(b.date).getTime() : 0;
+            return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+          }),
+          accounts,
+        };
+      });
 
       await syncToCloud(async () => {
         await firestoreService.addTransaction(newTx, get().accounts, get().transactions);
@@ -97,14 +110,36 @@ export function createTransactionActions(set: SetFn, get: GetFn) {
         if (toAcc) toAcc.balance += newTx.amount;
       }
 
-      set((state: any) => ({
-        transactions: state.transactions.map((t: any) => t.id === id ? newTx : t).sort((a: any, b: any) => {
-          const timeA = a.date ? new Date(a.date).getTime() : 0;
-          const timeB = b.date ? new Date(b.date).getTime() : 0;
-          return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
-        }),
-        accounts,
-      }));
+      set((state: any) => {
+        let updatedTransactions = state.transactions.map((t: any) => t.id === id ? newTx : t);
+
+        if (oldTx.reimbursedTxIds !== newTx.reimbursedTxIds) {
+          const oldIds = oldTx.reimbursedTxIds || [];
+          const newIds = newTx.reimbursedTxIds || [];
+          
+          const removedIds = oldIds.filter((tid: string) => !newIds.includes(tid));
+          const addedIds = newIds.filter((tid: string) => !oldIds.includes(tid));
+
+          updatedTransactions = updatedTransactions.map((t: any) => {
+            if (removedIds.includes(t.id)) {
+              return { ...t, isReimbursed: false, reimbursedByTxId: undefined };
+            }
+            if (addedIds.includes(t.id)) {
+              return { ...t, isReimbursed: true, reimbursedByTxId: newTx.id };
+            }
+            return t;
+          });
+        }
+
+        return {
+          transactions: updatedTransactions.sort((a: any, b: any) => {
+            const timeA = a.date ? new Date(a.date).getTime() : 0;
+            const timeB = b.date ? new Date(b.date).getTime() : 0;
+            return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+          }),
+          accounts,
+        };
+      });
 
       await syncToCloud(async () => {
         await firestoreService.updateTransaction(id, updatedFields, oldTx, get().accounts, get().transactions);
@@ -130,10 +165,32 @@ export function createTransactionActions(set: SetFn, get: GetFn) {
         if (toAcc) toAcc.balance -= tx.amount;
       }
 
-      set((state: any) => ({
-        transactions: state.transactions.filter((t: any) => t.id !== id),
-        accounts,
-      }));
+      set((state: any) => {
+        let updatedTransactions = state.transactions.filter((t: any) => t.id !== id);
+
+        if (tx.reimbursedTxIds && tx.reimbursedTxIds.length > 0) {
+          updatedTransactions = updatedTransactions.map((t: any) => {
+            if (tx.reimbursedTxIds.includes(t.id)) {
+              return { ...t, isReimbursed: false, reimbursedByTxId: undefined };
+            }
+            return t;
+          });
+        }
+
+        if (tx.reimbursedByTxId) {
+          updatedTransactions = updatedTransactions.map((t: any) => {
+            if (t.id === tx.reimbursedByTxId) {
+              return { ...t, reimbursedTxIds: t.reimbursedTxIds?.filter((tid: string) => tid !== id) || [] };
+            }
+            return t;
+          });
+        }
+
+        return {
+          transactions: updatedTransactions,
+          accounts,
+        };
+      });
 
       await syncToCloud(async () => {
         await firestoreService.deleteTransaction(id, tx, get().accounts, get().transactions);
